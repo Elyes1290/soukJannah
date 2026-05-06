@@ -1,20 +1,52 @@
-import { Head, useForm, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, router, usePage } from '@inertiajs/react';
+import { useState, useRef } from 'react';
 import AdminLayout from '../../../Layouts/AdminLayout';
 
 function CategoryForm({ initial, onCancel, submitUrl, method = 'post', submitLabel, parentOptions = [] }) {
-    const { data, setData, post, put, processing, errors, reset } = useForm({
-        name:        initial?.name ?? '',
-        description: initial?.description ?? '',
-        is_active:   initial?.is_active ?? true,
-        parent_id:   initial?.parent_id ?? '',
-    });
+    const [name, setName]             = useState(initial?.name ?? '');
+    const [description, setDesc]      = useState(initial?.description ?? '');
+    const [isActive, setActive]       = useState(initial?.is_active ?? true);
+    const [parentId, setParentId]     = useState(initial?.parent_id ?? '');
+    const [imageFile, setImageFile]   = useState(null);
+    const [removeImage, setRemove]    = useState(false);
+    const [preview, setPreview]       = useState(initial?.image ? `/storage/${initial.image}` : null);
+    const [processing, setProcessing] = useState(false);
+    const fileRef = useRef();
+
+    const handleImage = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setImageFile(file);
+        setRemove(false);
+        setPreview(URL.createObjectURL(file));
+    };
+
+    const handleRemove = () => {
+        setImageFile(null);
+        setRemove(true);
+        setPreview(null);
+        if (fileRef.current) fileRef.current.value = '';
+    };
 
     const submit = (e) => {
         e.preventDefault();
-        const options = { onSuccess: () => { reset(); onCancel?.(); } };
-        if (method === 'put') put(submitUrl, options);
-        else post(submitUrl, options);
+        setProcessing(true);
+        const payload = { name, description, is_active: isActive, parent_id: parentId || '' };
+        if (imageFile)   payload.image = imageFile;
+        if (removeImage) payload.remove_image = 1;
+
+        const opts = {
+            forceFormData: true,
+            onSuccess: () => { setProcessing(false); onCancel?.(); },
+            onError: () => setProcessing(false),
+        };
+
+        if (method === 'put') {
+            payload._method = 'PUT';
+            router.post(submitUrl, payload, opts);
+        } else {
+            router.post(submitUrl, payload, opts);
+        }
     };
 
     const inputStyle = {
@@ -29,11 +61,10 @@ function CategoryForm({ initial, onCancel, submitUrl, method = 'post', submitLab
                 <label className="block text-xs font-medium tracking-wider uppercase mb-2" style={{ color: '#6B6560' }}>
                     Nom *
                 </label>
-                <input type="text" value={data.name} onChange={e => setData('name', e.target.value)}
+                <input type="text" value={name} onChange={e => setName(e.target.value)}
                     style={inputStyle} placeholder="Ex : Viande halal" autoFocus
                     onFocus={e => e.target.style.borderColor = '#C8A96E'}
                     onBlur={e => e.target.style.borderColor = '#D4CFC8'} />
-                {errors.name && <p className="text-xs mt-1.5" style={{ color: '#E07070' }}>{errors.name}</p>}
             </div>
 
             {/* Catégorie parente */}
@@ -41,7 +72,7 @@ function CategoryForm({ initial, onCancel, submitUrl, method = 'post', submitLab
                 <label className="block text-xs font-medium tracking-wider uppercase mb-2" style={{ color: '#6B6560' }}>
                     Catégorie parente <span style={{ color: '#9A9490' }}>(laisser vide = catégorie principale)</span>
                 </label>
-                <select value={data.parent_id} onChange={e => setData('parent_id', e.target.value)}
+                <select value={parentId} onChange={e => setParentId(e.target.value)}
                     style={{ ...inputStyle, appearance: 'auto' }}
                     onFocus={e => e.target.style.borderColor = '#C8A96E'}
                     onBlur={e => e.target.style.borderColor = '#D4CFC8'}>
@@ -54,19 +85,53 @@ function CategoryForm({ initial, onCancel, submitUrl, method = 'post', submitLab
 
             <div>
                 <label className="block text-xs font-medium tracking-wider uppercase mb-2" style={{ color: '#6B6560' }}>Description</label>
-                <textarea value={data.description} onChange={e => setData('description', e.target.value)}
+                <textarea value={description} onChange={e => setDesc(e.target.value)}
                     style={{ ...inputStyle, resize: 'none', height: '80px' }}
                     onFocus={e => e.target.style.borderColor = '#C8A96E'}
                     onBlur={e => e.target.style.borderColor = '#D4CFC8'}
                     placeholder="Description optionnelle..." />
             </div>
 
+            {/* Image */}
+            <div>
+                <label className="block text-xs font-medium tracking-wider uppercase mb-2" style={{ color: '#6B6560' }}>
+                    Image <span style={{ color: '#9A9490' }}>(optionnel — recommandé pour les sous-catégories)</span>
+                </label>
+                <div className="flex items-center gap-4">
+                    {preview ? (
+                        <div className="relative">
+                            <img src={preview} alt="preview" className="w-16 h-16 object-cover rounded-full border" style={{ borderColor: '#E8E2D9' }} />
+                            <button type="button" onClick={handleRemove}
+                                className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-white text-xs"
+                                style={{ backgroundColor: '#E07070' }}>✕</button>
+                        </div>
+                    ) : (
+                        <div className="w-16 h-16 rounded-full border-2 border-dashed flex items-center justify-center cursor-pointer hover:border-amber-400 transition-colors"
+                            style={{ borderColor: '#D4CFC8' }}
+                            onClick={() => fileRef.current?.click()}>
+                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} style={{ color: '#C8A96E' }}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3 12h18M3 6h18" />
+                            </svg>
+                        </div>
+                    )}
+                    <div>
+                        <input ref={fileRef} type="file" accept="image/*" onChange={handleImage} className="hidden" />
+                        <button type="button" onClick={() => fileRef.current?.click()}
+                            className="px-3 py-2 text-xs font-medium border hover:bg-gray-50 transition-colors"
+                            style={{ borderColor: '#D4CFC8', color: '#6B6560' }}>
+                            {preview ? 'Changer l\'image' : 'Choisir une image'}
+                        </button>
+                        <p className="text-xs mt-1" style={{ color: '#9A9490' }}>JPG, PNG — max 2 Mo</p>
+                    </div>
+                </div>
+            </div>
+
             <div className="flex items-center gap-3">
-                <button type="button" onClick={() => setData('is_active', !data.is_active)}
+                <button type="button" onClick={() => setActive(!isActive)}
                     className="relative flex-shrink-0 transition-colors"
-                    style={{ width: '36px', height: '20px', borderRadius: '10px', backgroundColor: data.is_active ? '#C8A96E' : '#D4CFC8' }}>
+                    style={{ width: '36px', height: '20px', borderRadius: '10px', backgroundColor: isActive ? '#C8A96E' : '#D4CFC8' }}>
                     <span className="absolute bg-white shadow-sm transition-all"
-                        style={{ width: '14px', height: '14px', borderRadius: '50%', top: '3px', left: data.is_active ? '19px' : '3px' }} />
+                        style={{ width: '14px', height: '14px', borderRadius: '50%', top: '3px', left: isActive ? '19px' : '3px' }} />
                 </button>
                 <span className="text-xs font-medium" style={{ color: '#6B6560' }}>Catégorie active</span>
             </div>
@@ -91,7 +156,8 @@ function CategoryForm({ initial, onCancel, submitUrl, method = 'post', submitLab
 
 export default function CategoriesIndex({ categories, parentOptions = [] }) {
     const [showCreate, setShowCreate] = useState(false);
-    const [editingId, setEditingId] = useState(null);
+    const [editingId, setEditingId]   = useState(null);
+    const { props: { flash } }        = usePage();
 
     const handleDelete = (category) => {
         if ((category.products_count ?? 0) > 0) {
@@ -106,6 +172,12 @@ export default function CategoriesIndex({ categories, parentOptions = [] }) {
     return (
         <AdminLayout title="Catégories">
             <Head title="Catégories" />
+
+            {flash?.success && (
+                <div className="mb-4 px-4 py-3 text-sm font-light border-l-4" style={{ backgroundColor: '#f0fdf4', borderColor: '#16a34a', color: '#16a34a' }}>
+                    ✓ {flash.success}
+                </div>
+            )}
 
             <div className="flex items-center justify-between mb-6">
                 <p className="text-xs font-light" style={{ color: '#9A9490' }}>
@@ -183,7 +255,7 @@ export default function CategoriesIndex({ categories, parentOptions = [] }) {
                                         {cat.children.map(sub => (
                                             editingId === sub.id ? (
                                                 <tr key={sub.id}>
-                                                    <td colSpan={4} className="px-8 py-5">
+                                                    <td colSpan={5} className="px-8 py-5">
                                                         <p className="text-xs tracking-widest uppercase font-medium mb-4" style={{ color: '#C8A96E' }}>
                                                             Modifier : {sub.name}
                                                         </p>
@@ -194,7 +266,19 @@ export default function CategoriesIndex({ categories, parentOptions = [] }) {
                                                 </tr>
                                             ) : (
                                                 <tr key={sub.id} className="border-b group hover:bg-amber-50/30" style={{ borderColor: '#F5F2EE' }}>
-                                                    <td className="pl-10 pr-5 py-3">
+                                                    <td className="pl-10 pr-3 py-3 w-10">
+                                                        {sub.image ? (
+                                                            <img src={`/storage/${sub.image}`} alt={sub.name}
+                                                                className="w-8 h-8 rounded-full object-cover border"
+                                                                style={{ borderColor: '#E8E2D9' }} />
+                                                        ) : (
+                                                            <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
+                                                                style={{ backgroundColor: '#F0EBE1', color: '#C8A96E' }}>
+                                                                {sub.name.charAt(0).toUpperCase()}
+                                                            </div>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-3 py-3">
                                                         <div className="flex items-center gap-2">
                                                             <span style={{ color: '#C8A96E', fontSize: '10px' }}>└</span>
                                                             <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sub.is_active ? '#7B9E87' : '#D4CFC8' }} />

@@ -1,10 +1,19 @@
 import { Head, router } from '@inertiajs/react';
+import { useState } from 'react';
 import PublicLayout from '../../Layouts/PublicLayout';
 import { useT } from '../../contexts/LanguageContext';
 
 export default function CheckoutIndex({ cart }) {
     const { t, lang } = useT();
-    const handleCheckout = () => router.post('/checkout', { locale: lang });
+    const [orderNote, setOrderNote]     = useState('');
+    const [isGift, setIsGift]           = useState(false);
+    const [giftMessage, setGiftMessage] = useState('');
+
+    const handleCheckout = () => router.post('/checkout', {
+        locale:       lang,
+        order_note:   orderNote.trim() || null,
+        gift_message: isGift ? (giftMessage.trim() || null) : null,
+    });
 
     return (
         <PublicLayout>
@@ -32,6 +41,48 @@ export default function CheckoutIndex({ cart }) {
                                 <p className="text-sm font-medium" style={{ color: '#1A1A1A' }}>{(item.price * item.quantity).toFixed(2)} CHF</p>
                             </div>
                         ))}
+                        {/* Note de commande */}
+                        <div className="pt-8">
+                            <p className="text-xs tracking-widest uppercase mb-3 font-medium" style={{ color: '#1A1A1A' }}>
+                                {lang === 'fr' ? 'Note (optionnel)' : 'Order note (optional)'}
+                            </p>
+                            <textarea
+                                value={orderNote}
+                                onChange={e => setOrderNote(e.target.value)}
+                                rows={2}
+                                maxLength={300}
+                                placeholder={lang === 'fr' ? 'Instructions spéciales, allergie, préférence de livraison...' : 'Special instructions, allergy, delivery preference...'}
+                                className="w-full border px-4 py-3 text-sm font-light focus:outline-none focus:ring-1 focus:ring-stone-400 resize-none"
+                                style={{ borderColor: '#E8E2D9', backgroundColor: '#FAF8F4', color: '#1A1A1A' }}
+                            />
+                        </div>
+
+                        {/* Message cadeau */}
+                        <div className="pt-5">
+                            <label className="flex items-center gap-3 cursor-pointer group">
+                                <div
+                                    className="w-5 h-5 border flex-shrink-0 flex items-center justify-center transition-colors"
+                                    style={{ borderColor: isGift ? '#C8A96E' : '#D4CFC8', backgroundColor: isGift ? '#C8A96E' : 'transparent' }}
+                                    onClick={() => setIsGift(!isGift)}
+                                >
+                                    {isGift && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>}
+                                </div>
+                                <span className="text-sm font-light" style={{ color: '#1A1A1A' }}>
+                                    🎁 {lang === 'fr' ? "C'est un cadeau" : "This is a gift"}
+                                </span>
+                            </label>
+                            {isGift && (
+                                <textarea
+                                    value={giftMessage}
+                                    onChange={e => setGiftMessage(e.target.value)}
+                                    rows={2}
+                                    maxLength={300}
+                                    placeholder={lang === 'fr' ? 'Votre message personnalisé...' : 'Your personal message...'}
+                                    className="w-full mt-3 border px-4 py-3 text-sm font-light focus:outline-none focus:ring-1 focus:ring-amber-300 resize-none"
+                                    style={{ borderColor: '#C8A96E', backgroundColor: '#FFF8ED', color: '#1A1A1A' }}
+                                />
+                            )}
+                        </div>
                     </div>
 
                     <div>

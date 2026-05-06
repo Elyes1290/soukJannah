@@ -13,6 +13,7 @@ class CustomerMiddleware
         $customerId = $request->session()->get('customer_id');
 
         if (!$customerId || !Customer::find($customerId)) {
+            $request->session()->forget('customer_id');
             return redirect()->route('customer.login')
                 ->with('error', 'Veuillez vous connecter pour accéder à votre espace client.');
         }

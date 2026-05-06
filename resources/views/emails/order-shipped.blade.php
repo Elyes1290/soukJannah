@@ -61,6 +61,16 @@
                     </tr>
                     @endif
 
+                    {{-- Bouton suivi en ligne --}}
+                    <tr>
+                        <td style="padding:24px 40px 0;text-align:center;">
+                            <a href="{{ config('app.url') }}/suivi?number={{ $order->number }}"
+                               style="display:inline-block;background-color:#1A1A1A;color:#ffffff;padding:12px 28px;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.15em;text-decoration:none;">
+                                {{ $fr ? 'Suivre ma commande' : 'Track my order' }}
+                            </a>
+                        </td>
+                    </tr>
+
                     {{-- Récapitulatif articles --}}
                     <tr>
                         <td style="padding:32px 40px 0;">

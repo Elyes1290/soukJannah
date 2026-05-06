@@ -55,8 +55,16 @@ class WebhookController extends Controller
             return;
         }
 
-        $cart   = json_decode($session->metadata->cart ?? '{}', true);
-        $locale = $session->metadata->locale ?? 'en';
+        $cart        = json_decode($session->metadata->cart ?? '{}', true);
+        $locale      = $session->metadata->locale ?? 'en';
+        $orderNote   = $session->metadata->order_note ?? null;
+        $giftMessage = $session->metadata->gift_message ?? null;
+
+        // Compile les notes
+        $noteParts = [];
+        if ($orderNote)   $noteParts[] = $orderNote;
+        if ($giftMessage) $noteParts[] = '🎁 ' . $giftMessage;
+        $compiledNotes = $noteParts ? implode("\n---\n", $noteParts) : null;
 
         if (empty($cart['items'])) {
             return;
@@ -105,6 +113,7 @@ class WebhookController extends Controller
                 'stripe_session_id'     => $session->id,
                 'stripe_payment_intent' => $session->payment_intent,
                 'locale'                => $locale,
+                'notes'                 => $compiledNotes,
             ]);
 
             if (!empty($cart['discount_code'])) {

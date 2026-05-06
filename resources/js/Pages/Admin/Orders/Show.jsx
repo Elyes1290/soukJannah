@@ -105,17 +105,40 @@ export default function OrderShow({ order }) {
                 </div>
             )}
 
-            <div className="mb-6">
+            <div className="mb-6 flex items-center justify-between">
                 <Link href="/admin/commandes" className="inline-flex items-center gap-2 text-xs font-light hover:opacity-60 transition-opacity" style={{ color: '#9A9490' }}>
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                     </svg>
                     Retour aux commandes
                 </Link>
+                <a
+                    href={`/admin/commandes/${order.id}/facture`}
+                    target="_blank"
+                    className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium uppercase tracking-wider border transition-colors hover:bg-gray-50"
+                    style={{ borderColor: '#E8E2D9', color: '#6B6560' }}
+                >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    Télécharger la facture PDF
+                </a>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 <div className="lg:col-span-2 space-y-5">
+
+                    {/* Note de commande / message cadeau */}
+                    {order.notes && (
+                        <div className="border p-4" style={{ borderColor: '#C8A96E', backgroundColor: '#FFF8ED', borderLeft: '3px solid #C8A96E' }}>
+                            <p className="text-xs tracking-widest uppercase font-medium mb-2" style={{ color: '#C8A96E' }}>Note du client</p>
+                            {order.notes.split('\n---\n').map((note, i) => (
+                                <p key={i} className="text-sm font-light whitespace-pre-line" style={{ color: '#1A1A1A', marginBottom: i < order.notes.split('\n---\n').length - 1 ? '8px' : 0 }}>
+                                    {note}
+                                </p>
+                            ))}
+                        </div>
+                    )}
 
                     {/* Articles */}
                     <SectionCard title="Articles commandés">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\StockAlertController;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
@@ -131,7 +132,13 @@ class ProductController extends Controller
             unset($data['main_image']); // conserver l'image existante
         }
 
+        $wasOutOfStock = $product->stock === 0;
         $product->update($data);
+
+        // Si le produit était épuisé et que le stock vient d'être réapprovisionné, on notifie
+        if ($wasOutOfStock && $product->fresh()->stock > 0) {
+            StockAlertController::notifyForProduct($product->fresh());
+        }
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $i => $file) {

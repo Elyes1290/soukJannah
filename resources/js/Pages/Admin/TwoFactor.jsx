@@ -98,7 +98,7 @@ export default function AdminTwoFactor({ email }) {
 
                     <form onSubmit={handleSubmit}>
                         {/* 6 cases OTP */}
-                        <div className="flex gap-3 mb-6" onPaste={handlePaste}>
+                        <div className="flex justify-center gap-2 mb-6" onPaste={handlePaste}>
                             {digits.map((digit, i) => (
                                 <input
                                     key={i}
@@ -109,8 +109,11 @@ export default function AdminTwoFactor({ email }) {
                                     value={digit}
                                     onChange={e => handleChange(i, e.target.value)}
                                     onKeyDown={e => handleKeyDown(i, e)}
-                                    className="flex-1 h-14 text-center text-xl font-semibold outline-none transition-colors"
+                                    className="text-center text-xl font-semibold outline-none transition-colors"
                                     style={{
+                                        width: '44px',
+                                        height: '52px',
+                                        flexShrink: 0,
                                         backgroundColor: '#1A1A1A',
                                         border: `1px solid ${digit ? '#C8A96E' : '#2C2C2C'}`,
                                         color: '#FAF8F4',

@@ -10,13 +10,15 @@ class Review extends Model
     protected $fillable = [
         'customer_id', 'order_id', 'product_id',
         'author', 'location', 'rating',
-        'content', 'is_active', 'sort_order',
+        'content', 'is_active', 'is_approved', 'sort_order', 'verified_purchase',
     ];
 
     protected $casts = [
-        'is_active'  => 'boolean',
-        'rating'     => 'integer',
-        'sort_order' => 'integer',
+        'is_active'         => 'boolean',
+        'is_approved'       => 'boolean',
+        'verified_purchase' => 'boolean',
+        'rating'            => 'integer',
+        'sort_order'        => 'integer',
     ];
 
     public function product(): BelongsTo

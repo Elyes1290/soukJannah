@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\DiscountCodeController;
 use App\Http\Controllers\Admin\FeaturedOfferController;
 use App\Http\Controllers\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Admin\ReviewController;
+use App\Http\Controllers\Admin\ReturnController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Blog\PostController as BlogPostController;
 use App\Http\Controllers\CartController;
@@ -22,6 +23,9 @@ use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\Shop\ProductController as ShopProductController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\Customer\SocialAuthController;
+use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\NewsletterController;
 
 // Cron HTTP (pour Infomaniak planificateur de tâches)
 Route::get('/cron/abandoned-carts', function (\Illuminate\Http\Request $request) {
@@ -68,6 +72,17 @@ Route::get('/faq', fn() => Inertia::render('Faq'))->name('faq');
 Route::get('/mentions-legales', fn() => Inertia::render('MentionsLegales'))->name('mentions-legales');
 
 // Espace client — public
+// Suivi de commande public
+Route::get('/suivi', [TrackingController::class, 'index'])->name('tracking.index');
+Route::post('/suivi', [TrackingController::class, 'track'])->name('tracking.track');
+
+// Alerte retour en stock
+Route::post('/stock-alert/subscribe', [\App\Http\Controllers\StockAlertController::class, 'subscribe'])->name('stock-alert.subscribe');
+
+// Newsletter
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribeByToken'])->name('newsletter.unsubscribe');
+
 // Social OAuth
 Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->name('social.redirect');
 Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback'])->name('social.callback');
@@ -97,11 +112,19 @@ Route::middleware('customer')->group(function () {
     Route::post('/mon-compte/adresses/{address}/default',       [CustomerController::class, 'setDefaultAddress'])->name('customer.addresses.default');
 
     // Avis
+    Route::get('/mon-compte/commandes/{order}/facture', [InvoiceController::class, 'customerDownload'])->name('customer.invoice');
+
+    // Wishlist
+    Route::get('/mon-compte/favoris', [\App\Http\Controllers\Customer\WishlistController::class, 'index'])->name('customer.wishlist');
+    Route::post('/mon-compte/favoris/toggle', [\App\Http\Controllers\Customer\WishlistController::class, 'toggle'])->name('customer.wishlist.toggle');
     Route::get('/mon-compte/avis',   [CustomerController::class, 'showReviews'])->name('customer.reviews');
     Route::post('/mon-compte/avis',  [CustomerController::class, 'storeReview'])->name('customer.reviews.store');
 
     // Codes promo
     Route::get('/mon-compte/promos', [CustomerController::class, 'showPromos'])->name('customer.promos');
+
+    // Retours
+    Route::post('/mon-compte/commandes/{order}/retour', [CustomerController::class, 'storeReturn'])->name('customer.return.store');
 });
 
 // Webhook Stripe (exclut CSRF via bootstrap/app.php)
@@ -131,12 +154,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Commandes
         Route::get('/commandes', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('/commandes/export/csv', [OrderController::class, 'export'])->name('orders.export');
         Route::get('/commandes/{order}', [OrderController::class, 'show'])->name('orders.show');
         Route::post('/commandes/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status');
         Route::post('/commandes/{order}/tracking', [OrderController::class, 'updateTracking'])->name('orders.tracking');
         Route::post('/commandes/{order}/ship', [OrderController::class, 'ship'])->name('orders.ship');
         Route::post('/commandes/{order}/refund', [OrderController::class, 'refund'])->name('orders.refund');
         Route::post('/commandes/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+        Route::get('/commandes/{order}/facture', [InvoiceController::class, 'adminDownload'])->name('orders.invoice');
 
         // Paramètres
         Route::get('/parametres', [SettingController::class, 'index'])->name('settings.index');
@@ -160,6 +185,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('/offres/{featuredOffer}', [FeaturedOfferController::class, 'update'])->name('featured-offers.update');
         Route::delete('/offres/{featuredOffer}', [FeaturedOfferController::class, 'destroy'])->name('featured-offers.destroy');
 
+        // Newsletter
+        Route::get('/newsletter', [\App\Http\Controllers\Admin\NewsletterAdminController::class, 'index'])->name('newsletter.index');
+        Route::delete('/newsletter/{subscriber}', [\App\Http\Controllers\Admin\NewsletterAdminController::class, 'destroy'])->name('newsletter.destroy');
+        Route::get('/newsletter/export', [\App\Http\Controllers\Admin\NewsletterAdminController::class, 'export'])->name('newsletter.export');
+
         Route::get('/avis', [ReviewController::class, 'index'])->name('reviews.index');
         Route::post('/avis', [ReviewController::class, 'store'])->name('reviews.store');
         Route::put('/avis/{review}', [ReviewController::class, 'update'])->name('reviews.update');
@@ -171,5 +201,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/articles/{post}/modifier', [AdminPostController::class, 'edit'])->name('posts.edit');
         Route::put('/articles/{post}', [AdminPostController::class, 'update'])->name('posts.update');
         Route::delete('/articles/{post}', [AdminPostController::class, 'destroy'])->name('posts.destroy');
+
+        // Retours clients
+        Route::get('/retours', [ReturnController::class, 'index'])->name('returns.index');
+        Route::post('/retours/{return}/decision', [ReturnController::class, 'decide'])->name('returns.decide');
     });
 });

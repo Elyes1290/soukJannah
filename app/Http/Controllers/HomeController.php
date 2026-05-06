@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Customer;
 use App\Models\FeaturedOffer;
+use App\Models\Order;
 use App\Models\Post;
 use App\Models\Product;
 use App\Models\Review;
@@ -82,6 +84,12 @@ class HomeController extends Controller
                 'reading_time'    => $p->reading_time,
             ]);
 
-        return Inertia::render('Home', compact('featured', 'categories', 'featuredOffers', 'reviews', 'latestPosts'));
+        $stats = [
+            'orders_shipped'  => Order::whereIn('status', ['shipped', 'delivered'])->count(),
+            'happy_customers' => Customer::distinct('email')->count('email'),
+            'products_count'  => Product::where('is_active', true)->count(),
+        ];
+
+        return Inertia::render('Home', compact('featured', 'categories', 'featuredOffers', 'reviews', 'latestPosts', 'stats'));
     }
 }

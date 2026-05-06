@@ -2,6 +2,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useState, useRef } from 'react';
 import PublicLayout from '../../Layouts/PublicLayout';
 import { useT } from '../../contexts/LanguageContext';
+import WishlistButton from '../../Components/WishlistButton';
 
 function SortDropdown({ activeSort, onChange }) {
     const { t } = useT();
@@ -77,6 +78,9 @@ function ProductCard({ product }) {
                 <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5">
                     {product.sale_price && <span className="px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: '#C8A96E', color: 'white' }}>{t('common_promo')}</span>}
                     {product.is_featured && !product.sale_price && <span className="px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: '#1A1A1A', color: 'white' }}>{t('common_featured')}</span>}
+                </div>
+                <div className="absolute top-2 right-2">
+                    <WishlistButton productId={product.id} size="sm" />
                 </div>
                 {product.stock === 0 && (
                     <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'rgba(250,248,244,0.75)' }}>

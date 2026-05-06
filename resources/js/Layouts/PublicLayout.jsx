@@ -1,8 +1,66 @@
-import { Link, usePage } from "@inertiajs/react";
+import { Link, usePage, useForm } from "@inertiajs/react";
 import { useState, useRef } from "react";
 import Analytics from "../Components/Analytics";
 import CookieBanner from "../Components/CookieBanner";
 import { useT } from "../contexts/LanguageContext";
+
+function NewsletterForm({ lang }) {
+    const { flash } = usePage().props;
+    const { data, setData, post, processing, reset } = useForm({ email: '', locale: lang || 'fr' });
+    const success = flash?.newsletter_success;
+
+    const submit = (e) => {
+        e.preventDefault();
+        post('/newsletter/subscribe', { onSuccess: () => reset() });
+    };
+
+    return (
+        <div className="border-t border-b py-10 mb-12" style={{ borderColor: '#2C2C2C' }}>
+            <div className="max-w-xl mx-auto text-center">
+                <p className="text-xs tracking-[0.3em] uppercase mb-2" style={{ color: '#C8A96E' }}>
+                    Newsletter
+                </p>
+                <h3 className="font-serif text-xl mb-2" style={{ color: '#FAF8F4' }}>
+                    {lang === 'fr' ? 'Offres exclusives & nouveautés' : 'Exclusive offers & new arrivals'}
+                </h3>
+                <p className="text-xs mb-6 font-light" style={{ color: '#6B6560' }}>
+                    {lang === 'fr'
+                        ? 'Inscrivez-vous pour recevoir nos meilleures offres et être informé des nouveaux produits.'
+                        : 'Subscribe to receive our best deals and be notified of new products.'}
+                </p>
+
+                {success ? (
+                    <div className="flex items-center justify-center gap-2 text-sm font-medium" style={{ color: '#C8A96E' }}>
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {lang === 'fr' ? 'Merci pour votre inscription !' : 'Thank you for subscribing!'}
+                    </div>
+                ) : (
+                    <form onSubmit={submit} className="flex gap-0 max-w-sm mx-auto">
+                        <input
+                            type="email"
+                            value={data.email}
+                            onChange={e => setData('email', e.target.value)}
+                            placeholder={lang === 'fr' ? 'Votre adresse email' : 'Your email address'}
+                            required
+                            className="flex-1 px-4 py-3 text-sm font-light outline-none"
+                            style={{ backgroundColor: '#2C2C2C', color: '#FAF8F4', border: '1px solid #3C3C3C', borderRight: 'none' }}
+                        />
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="px-5 py-3 text-xs font-medium uppercase tracking-wider flex-shrink-0 transition-colors disabled:opacity-50"
+                            style={{ backgroundColor: '#C8A96E', color: '#1A1A1A', letterSpacing: '0.1em' }}
+                        >
+                            {processing ? '...' : (lang === 'fr' ? "S'inscrire" : 'Subscribe')}
+                        </button>
+                    </form>
+                )}
+            </div>
+        </div>
+    );
+}
 
 export default function PublicLayout({ children }) {
     const {
@@ -470,10 +528,19 @@ export default function PublicLayout({ children }) {
                                                                     {subs.map((sub, i) => (
                                                                         <Link key={sub.slug} href={`/boutique?categorie=${sub.slug}`}
                                                                             className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-amber-50 transition-colors group">
-                                                                            <div className="w-14 h-14 rounded-full flex items-center justify-center text-lg font-bold shadow-sm group-hover:scale-105 transition-transform"
-                                                                                style={{ backgroundColor: palette[i % palette.length], color: textPalette[i % textPalette.length] }}>
-                                                                                {sub.name.charAt(0).toUpperCase()}
-                                                                            </div>
+                                                                            {sub.image ? (
+                                                                                <img
+                                                                                    src={`/storage/${sub.image}`}
+                                                                                    alt={sub.name}
+                                                                                    className="w-16 h-16 rounded-full object-cover shadow-sm group-hover:scale-105 transition-transform border-2"
+                                                                                    style={{ borderColor: "#E8E2D9" }}
+                                                                                />
+                                                                            ) : (
+                                                                                <div className="w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold shadow-sm group-hover:scale-105 transition-transform"
+                                                                                    style={{ backgroundColor: palette[i % palette.length], color: textPalette[i % textPalette.length] }}>
+                                                                                    {sub.name.charAt(0).toUpperCase()}
+                                                                                </div>
+                                                                            )}
                                                                             <span className="text-xs text-center font-medium leading-tight" style={{ color: "#1A1A1A" }}>{sub.name}</span>
                                                                         </Link>
                                                                     ))}
@@ -992,6 +1059,7 @@ export default function PublicLayout({ children }) {
                                     {[
                                         [t("footer_delivery"), "/livraison"],
                                         [t("footer_faq"), "/faq"],
+                                        ["Suivi de commande", "/suivi"],
                                         [
                                             t("footer_legal"),
                                             "/mentions-legales",
@@ -1010,6 +1078,9 @@ export default function PublicLayout({ children }) {
                                 </ul>
                             </div>
                         </div>
+                        {/* Newsletter */}
+                        <NewsletterForm lang={lang} />
+
                         <div
                             className="border-t pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
                             style={{ borderColor: "#2C2C2C" }}

@@ -93,6 +93,13 @@
                                 ? 'Vous recevrez un email dès que votre commande sera expédiée, avec votre numéro de suivi.'
                                 : 'You will receive an email as soon as your order is shipped with your tracking number.' }}
                         </p>
+
+                        <div style="text-align:center;margin-top:20px;">
+                            <a href="{{ config('app.url') }}/suivi?number={{ $order->number }}"
+                               style="display:inline-block;background-color:#1A1A1A;color:#ffffff;padding:12px 28px;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.15em;text-decoration:none;">
+                                {{ $fr ? 'Suivre ma commande' : 'Track my order' }}
+                            </a>
+                        </div>
                     </div>
 
                     <div class="separator"></div>

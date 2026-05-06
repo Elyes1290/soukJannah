@@ -41,8 +41,8 @@ function CategoryIcon() {
     );
 }
 
-export default function Home({ featured, categories = [], featuredOffers = [], reviews = [], latestPosts = [] }) {
-    const { t } = useT();
+export default function Home({ featured, categories = [], featuredOffers = [], reviews = [], latestPosts = [], stats = {} }) {
+    const { t, lang } = useT();
 
     const BENEFITS = [
         { icon: '✦', title: t('home_benefit1_title'), desc: t('home_benefit1_desc') },
@@ -92,6 +92,44 @@ export default function Home({ featured, categories = [], featuredOffers = [], r
                     </svg>
                 </div>
             </section>
+
+            {/* Compteurs de confiance */}
+            {(stats.orders_shipped > 0 || stats.happy_customers > 0 || stats.products_count > 0) && (
+                <section style={{ backgroundColor: '#1A1A1A' }}>
+                    <div className="max-w-6xl mx-auto px-4 py-8">
+                        <div className="grid grid-cols-3 divide-x" style={{ divideColor: '#333' }}>
+                            {[
+                                {
+                                    value: stats.orders_shipped >= 100
+                                        ? `+${Math.floor(stats.orders_shipped / 10) * 10}`
+                                        : stats.orders_shipped,
+                                    label_en: 'Orders shipped',
+                                    label_fr: 'Commandes expédiées',
+                                },
+                                {
+                                    value: stats.happy_customers >= 50
+                                        ? `+${Math.floor(stats.happy_customers / 10) * 10}`
+                                        : stats.happy_customers,
+                                    label_en: 'Happy customers',
+                                    label_fr: 'Clients satisfaits',
+                                },
+                                {
+                                    value: stats.products_count,
+                                    label_en: 'Premium products',
+                                    label_fr: 'Produits premium',
+                                },
+                            ].map((s, i) => (
+                                <div key={i} className="text-center py-2 px-4" style={{ borderColor: '#333' }}>
+                                    <p className="font-serif text-2xl md:text-3xl font-normal mb-1" style={{ color: '#C8A96E' }}>{s.value}</p>
+                                    <p className="text-xs font-light tracking-wider uppercase" style={{ color: '#9A9490' }}>
+                                        {lang === 'fr' ? s.label_fr : s.label_en}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
 
             {/* Catégories */}
             {categories.length > 0 && (

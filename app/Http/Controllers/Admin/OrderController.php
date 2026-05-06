@@ -209,4 +209,80 @@ class OrderController extends Controller
 
         return back()->with('success', $msg);
     }
+
+    public function export(Request $request)
+    {
+        $query = Order::with(['items.product', 'customer'])
+            ->orderByDesc('created_at');
+
+        if ($request->filled('from')) {
+            $query->whereDate('created_at', '>=', $request->from);
+        }
+        if ($request->filled('to')) {
+            $query->whereDate('created_at', '<=', $request->to);
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $orders = $query->get();
+
+        $statusLabels = [
+            'pending'   => 'En attente',
+            'paid'      => 'Payée',
+            'preparing' => 'En préparation',
+            'shipped'   => 'Expédiée',
+            'delivered' => 'Livrée',
+            'cancelled' => 'Annulée',
+            'refunded'  => 'Remboursée',
+            'disputed'  => 'Litige',
+        ];
+
+        $rows   = [];
+        $rows[] = implode(';', [
+            'N° Commande', 'Date', 'Statut', 'Client', 'Email', 'Téléphone',
+            'Adresse', 'Ville', 'Code postal', 'Pays',
+            'Sous-total (CHF)', 'Livraison (CHF)', 'Total (CHF)',
+            'Remboursé (CHF)', 'N° Suivi', 'Articles',
+        ]);
+
+        foreach ($orders as $order) {
+            $c     = $order->customer;
+            $items = $order->items->map(fn($i) =>
+                ($i->product_name ?? $i->product?->name ?? '?') . ' x' . $i->quantity . ' (' . number_format($i->price, 2) . ' CHF)'
+            )->implode(' | ');
+
+            $row = [
+                $order->number,
+                $order->created_at->format('d/m/Y H:i'),
+                $statusLabels[$order->status] ?? $order->status,
+                $c?->full_name ?? '',
+                $c?->email ?? '',
+                $c?->phone ?? '',
+                $c?->address ?? '',
+                $c?->city ?? '',
+                $c?->postal_code ?? '',
+                $c?->country ?? '',
+                number_format((float) $order->subtotal, 2),
+                number_format((float) $order->shipping, 2),
+                number_format((float) $order->total, 2),
+                number_format((float) ($order->refunded_amount ?? 0), 2),
+                $order->tracking_number ?? '',
+                $items,
+            ];
+
+            $rows[] = implode(';', array_map(
+                fn($v) => '"' . str_replace('"', '""', (string) $v) . '"',
+                $row
+            ));
+        }
+
+        $csv      = "\xEF\xBB\xBF" . implode("\n", $rows); // BOM UTF-8 pour Excel
+        $filename = 'commandes-' . now()->format('Y-m-d') . '.csv';
+
+        return response($csv, 200, [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ]);
+    }
 }

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Mail\CustomerVerificationMail;
+use App\Mail\ReturnDecisionMail;
+use App\Mail\ReturnRequestMail;
 use App\Models\Customer;
 use App\Models\CustomerAddress;
 use App\Models\DiscountCode;
 use App\Models\Order;
+use App\Models\ReturnRequest;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -21,10 +24,17 @@ class CustomerController extends Controller
 
     public function showLogin(Request $request)
     {
-        if (session('customer_id')) {
+        $customerId = session('customer_id');
+        if ($customerId && Customer::find($customerId)) {
             $redirect = $request->query('redirect');
             return redirect($redirect && str_starts_with($redirect, '/') ? $redirect : route('customer.dashboard'));
         }
+
+        // Session orpheline (client supprimé) → on nettoie
+        if ($customerId) {
+            $request->session()->forget('customer_id');
+        }
+
         return Inertia::render('Customer/Login', [
             'redirectTo' => $request->query('redirect', ''),
         ]);
@@ -459,13 +469,14 @@ class CustomerController extends Controller
         }
 
         Review::create([
-            'customer_id' => $customer->id,
-            'order_id'    => $request->order_id,
-            'product_id'  => $request->product_id,
-            'author'      => $customer->first_name . ' ' . substr($customer->last_name, 0, 1) . '.',
-            'rating'      => $request->rating,
-            'content'     => $request->content,
-            'is_active'   => false,
+            'customer_id'       => $customer->id,
+            'order_id'          => $request->order_id,
+            'product_id'        => $request->product_id,
+            'author'            => $customer->first_name . ' ' . substr($customer->last_name, 0, 1) . '.',
+            'rating'            => $request->rating,
+            'content'           => $request->content,
+            'is_active'         => false,
+            'verified_purchase' => true,
         ]);
 
         return back()->with('success', 'Merci pour votre avis ! Il sera visible après validation.');
@@ -508,7 +519,7 @@ class CustomerController extends Controller
                 $q->where('customer_id', $customer->id)
                   ->orWhereHas('customer', fn($sq) => $sq->where('email', $customer->email));
             })
-            ->with('items')
+            ->with(['items', 'returnRequest'])
             ->latest()
             ->get()
             ->map(fn($o) => [
@@ -519,12 +530,59 @@ class CustomerController extends Controller
                 'shipping'        => $o->shipping,
                 'tracking_number' => $o->tracking_number,
                 'created_at'      => $o->created_at->format('d/m/Y'),
+                'return_request'  => $o->returnRequest ? [
+                    'status'      => $o->returnRequest->status,
+                    'admin_notes' => $o->returnRequest->admin_notes,
+                ] : null,
                 'items'           => $o->items->map(fn($i) => [
                     'product_name' => $i->product_name,
                     'quantity'     => $i->quantity,
                     'total'        => $i->total,
                 ]),
             ]);
+    }
+
+    // ── Retours ───────────────────────────────────────────────────────────────
+
+    public function storeReturn(Request $request, Order $order)
+    {
+        $customerId = (int) session('customer_id');
+        $customer   = Customer::findOrFail($customerId);
+        $order->loadMissing('customer');
+
+        // Vérifie que la commande appartient au client (par ID ou par email)
+        $ownsOrder = (int) $order->customer_id === $customerId
+            || ($order->customer && $order->customer->email === $customer->email);
+
+        if (!$ownsOrder || $order->status !== 'delivered') {
+            abort(403);
+        }
+
+        // Un seul retour par commande
+        if ($order->returnRequest()->exists()) {
+            return back()->with('error', 'Une demande de retour existe déjà pour cette commande.');
+        }
+
+        $data = $request->validate([
+            'reason'  => 'required|string|max:255',
+            'message' => 'nullable|string|max:1000',
+        ]);
+
+        $returnRequest = ReturnRequest::create([
+            'order_id'    => $order->id,
+            'customer_id' => $customerId,
+            'reason'      => $data['reason'],
+            'message'     => $data['message'] ?? null,
+            'status'      => 'pending',
+        ]);
+
+        // Notification à l'admin
+        $adminEmail = config('mail.admin_address', env('ADMIN_EMAIL', env('MAIL_FROM_ADDRESS')));
+        if ($adminEmail) {
+            Mail::to($adminEmail)->send(new ReturnRequestMail($returnRequest));
+        }
+
+        return back()->with('success', 'Votre demande de retour a bien été envoyée. Nous vous répondrons sous 48h.');
     }
 
     private function customerData(Customer $customer): array

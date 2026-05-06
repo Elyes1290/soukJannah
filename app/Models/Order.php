@@ -24,6 +24,11 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function returnRequest(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ReturnRequest::class);
+    }
+
     public static function generateNumber(): string
     {
         return 'CMD-' . strtoupper(substr(uniqid(), -6));

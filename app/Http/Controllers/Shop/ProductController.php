@@ -142,13 +142,14 @@ class ProductController extends Controller
         }
 
         Review::create([
-            'customer_id' => $customerId,
-            'order_id'    => $request->order_id,
-            'product_id'  => $product->id,
-            'author'      => $customer->first_name . ' ' . substr($customer->last_name, 0, 1) . '.',
-            'rating'      => $request->rating,
-            'content'     => $request->content,
-            'is_active'   => false,
+            'customer_id'       => $customerId,
+            'order_id'          => $request->order_id,
+            'product_id'        => $product->id,
+            'author'            => $customer->first_name . ' ' . substr($customer->last_name, 0, 1) . '.',
+            'rating'            => $request->rating,
+            'content'           => $request->content,
+            'is_active'         => false,
+            'verified_purchase' => true,
         ]);
 
         return back()->with('review_success', true);
@@ -166,11 +167,12 @@ class ProductController extends Controller
             ->latest()
             ->get()
             ->map(fn($r) => [
-                'id'         => $r->id,
-                'author'     => $r->author,
-                'rating'     => $r->rating,
-                'content'    => $r->content,
-                'created_at' => $r->created_at->format('d M Y'),
+                'id'                => $r->id,
+                'author'            => $r->author,
+                'rating'            => $r->rating,
+                'content'           => $r->content,
+                'verified_purchase' => (bool) $r->verified_purchase,
+                'created_at'        => $r->created_at->format('d M Y'),
             ]);
 
         $avgRating     = $reviews->avg('rating');
@@ -230,6 +232,7 @@ class ProductController extends Controller
                 'name'              => $product->name,
                 'description'       => $product->description,
                 'short_description' => $product->short_description,
+                'sku'               => $product->sku,
                 'price'             => $product->price,
                 'sale_price'        => $product->sale_price,
                 'stock'             => $product->stock,

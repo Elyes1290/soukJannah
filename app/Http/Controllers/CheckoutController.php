@@ -75,27 +75,35 @@ class CheckoutController extends Controller
             ];
         }
 
+        $orderNote   = $request->input('order_note') ? substr($request->input('order_note'), 0, 300) : null;
+        $giftMessage = $request->input('gift_message') ? substr($request->input('gift_message'), 0, 300) : null;
+
+        $metadata = [
+            'locale' => in_array($request->input('locale'), ['en', 'fr']) ? $request->input('locale') : 'en',
+            'cart'   => json_encode([
+                'items' => array_map(fn($item) => [
+                    'product_id' => $item['product_id'],
+                    'quantity'   => $item['quantity'],
+                    'price'      => $item['price'],
+                ], $cartSummary['items']),
+                'subtotal'      => $cartSummary['subtotal'],
+                'shipping'      => $cartSummary['shipping'],
+                'discount'      => $cartSummary['discount'],
+                'discount_code' => $cartSummary['discount_code']['code'] ?? null,
+                'total'         => $cartSummary['total'],
+            ]),
+        ];
+
+        if ($orderNote)   $metadata['order_note']   = $orderNote;
+        if ($giftMessage) $metadata['gift_message'] = $giftMessage;
+
         $session = Session::create([
             'payment_method_types' => ['card', 'klarna', 'twint'],
             'line_items'           => $lineItems,
             'mode'                 => 'payment',
             'success_url'          => route('checkout.success') . '?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url'           => route('checkout.cancel'),
-            'metadata'             => [
-                'locale' => in_array($request->input('locale'), ['en', 'fr']) ? $request->input('locale') : 'en',
-                'cart'   => json_encode([
-                    'items' => array_map(fn($item) => [
-                        'product_id' => $item['product_id'],
-                        'quantity'   => $item['quantity'],
-                        'price'      => $item['price'],
-                    ], $cartSummary['items']),
-                    'subtotal'      => $cartSummary['subtotal'],
-                    'shipping'      => $cartSummary['shipping'],
-                    'discount'      => $cartSummary['discount'],
-                    'discount_code' => $cartSummary['discount_code']['code'] ?? null,
-                    'total'         => $cartSummary['total'],
-                ]),
-            ],
+            'metadata'             => $metadata,
         ]);
 
         return Inertia::location($session->url);
