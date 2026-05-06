@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /panier
+Disallow: /checkout
+
+Sitemap: https://halalswissshop.elyesnaitliman.ch/sitemap.xml
