@@ -17,8 +17,9 @@ export default function CheckoutIndex({ cart }) {
 
     return (
         <PublicLayout>
-            <Head title={t('checkout_title')} />
-
+            <Head title={`${t('checkout_title')} — SoukJannah`}>
+                <meta head-key="description" name="description" content={t('meta_checkout')} />
+            </Head>
             <section className="border-b py-12 text-center" style={{ backgroundColor: '#F0EBE1', borderColor: '#E8E2D9' }}>
                 <p className="text-xs tracking-[0.4em] uppercase mb-3 font-light" style={{ color: '#C8A96E' }}>{t('checkout_tag')}</p>
                 <h1 className="font-serif text-3xl font-normal" style={{ color: '#1A1A1A' }}>{t('checkout_summary')}</h1>

@@ -14,8 +14,9 @@ export default function About() {
 
     return (
         <PublicLayout>
-            <Head title={`${t('about_title')} — SoukJannah`} />
-
+            <Head title={`${t('about_title')} — SoukJannah`}>
+                <meta head-key="description" name="description" content={t('meta_about')} />
+            </Head>
             {/* Hero */}
             <section className="border-b py-24 text-center" style={{ backgroundColor: '#F0EBE1', borderColor: '#E8E2D9' }}>
                 <p className="text-xs tracking-[0.4em] uppercase mb-5 font-light" style={{ color: '#C8A96E' }}>{t('about_tag')}</p>

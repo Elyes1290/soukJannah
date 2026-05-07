@@ -7,11 +7,11 @@ export default function BlogShow({ post, related }) {
     return (
         <PublicLayout>
             <Head>
-                <title>{post.title}</title>
-                {post.meta_description && <meta name="description" content={post.meta_description} />}
-                {post.cover_image_url && <meta property="og:image" content={post.cover_image_url} />}
+                <title>{`${post.title ?? ''} — SoukJannah`}</title>
+                <meta head-key="description" name="description" content={(post.meta_description || post.excerpt || t('blog_subtitle')).slice(0, 170)} />
+                {post.cover_image_url && <meta head-key="og:image" property="og:image" content={post.cover_image_url} />}
                 <meta property="og:title" content={post.title} />
-                {post.meta_description && <meta property="og:description" content={post.meta_description} />}
+                <meta head-key="og:description" property="og:description" content={(post.meta_description || post.excerpt || t('blog_subtitle')).slice(0, 200)} />
             </Head>
 
             {/* Cover image */}

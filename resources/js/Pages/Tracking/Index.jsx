@@ -1,4 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
+import { useEffect } from 'react';
 import PublicLayout from '../../Layouts/PublicLayout';
 import { useT } from '../../contexts/LanguageContext';
 
@@ -48,9 +49,15 @@ function StatusBar({ step }) {
     );
 }
 
-export default function TrackingIndex({ order, error, prefillNumber = '' }) {
+export default function TrackingIndex({ order, error, prefillNumber = '', trackingError = null }) {
     const { t } = useT();
-    const { data, setData, post, processing } = useForm({ number: prefillNumber, email: '' });
+    const { data, setData, post, processing } = useForm({ number: prefillNumber || '', email: '' });
+
+    useEffect(() => {
+        if (prefillNumber) {
+            setData('number', prefillNumber);
+        }
+    }, [prefillNumber]);
 
     const submit = (e) => {
         e.preventDefault();
@@ -61,11 +68,12 @@ export default function TrackingIndex({ order, error, prefillNumber = '' }) {
 
     return (
         <PublicLayout>
-            <Head title="Suivi de commande — SoukJannah" />
-
+            <Head title={`${t('tracking_page_title')} — SoukJannah`}>
+                <meta head-key="description" name="description" content={t('meta_tracking')} />
+            </Head>
             <section className="border-b py-12 text-center" style={{ backgroundColor: '#F0EBE1', borderColor: '#E8E2D9' }}>
                 <p className="text-xs tracking-[0.4em] uppercase mb-3 font-light" style={{ color: '#C8A96E' }}>SoukJannah</p>
-                <h1 className="font-serif text-3xl font-normal" style={{ color: '#1A1A1A' }}>Suivi de commande</h1>
+                <h1 className="font-serif text-3xl font-normal" style={{ color: '#1A1A1A' }}>{t('tracking_page_title')}</h1>
                 <div className="h-px w-10 mx-auto mt-4" style={{ backgroundColor: '#C8A96E' }}></div>
             </section>
 
@@ -111,9 +119,9 @@ export default function TrackingIndex({ order, error, prefillNumber = '' }) {
                             />
                         </div>
 
-                        {error && (
+                        {(error || trackingError) && (
                             <div className="p-3 border text-sm font-light" style={{ borderColor: '#dc2626', backgroundColor: '#fef2f2', color: '#dc2626' }}>
-                                {error}
+                                {error ?? (trackingError ? t(`tracking_err_${trackingError}`) : '')}
                             </div>
                         )}
 

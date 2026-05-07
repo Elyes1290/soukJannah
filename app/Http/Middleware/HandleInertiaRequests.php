@@ -8,6 +8,7 @@ use App\Models\Setting;
 use App\Models\Wishlist;
 use App\Services\CartService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -45,54 +46,63 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'flash' => [
-                'success'          => $request->session()->get('success'),
-                'error'            => $request->session()->get('error'),
-                'contact_success'  => $request->session()->get('contact_success'),
-                'discount_success'       => $request->session()->get('discount_success'),
-                'discount_error'         => $request->session()->get('discount_error'),
-                'newsletter_success'     => $request->session()->get('newsletter_success'),
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
+                'contact_success' => $request->session()->get('contact_success'),
+                'discount_success' => $request->session()->get('discount_success'),
+                'discount_error' => $request->session()->get('discount_error'),
+                'newsletter_success' => $request->session()->get('newsletter_success'),
                 'newsletter_unsubscribed' => $request->session()->get('newsletter_unsubscribed'),
             ],
-            'cartCount'  => $cart->count(),
+            'cartCount' => $cart->count(),
             'navCategories' => Category::where('is_active', true)
                 ->whereNull('parent_id')
-                ->with(['children' => fn($q) => $q->where('is_active', true)->orderBy('sort_order')])
-                ->withCount(['products' => fn($q) => $q->where('is_active', true)])
+                ->with(['children' => fn ($q) => $q->where('is_active', true)->orderBy('sort_order')])
+                ->withCount(['products' => fn ($q) => $q->where('is_active', true)])
                 ->orderBy('sort_order')
                 ->get(['id', 'name', 'slug', 'image'])
-                ->map(fn($c) => [
-                    'id'       => $c->id,
-                    'name'     => $c->name,
-                    'slug'     => $c->slug,
-                    'image'    => $c->image,
-                    'children' => $c->children->map(fn($sub) => [
-                        'id'    => $sub->id,
-                        'name'  => $sub->name,
-                        'slug'  => $sub->slug,
+                ->map(fn ($c) => [
+                    'id' => $c->id,
+                    'name' => $c->name,
+                    'slug' => $c->slug,
+                    'image' => $c->image,
+                    'children' => $c->children->map(fn ($sub) => [
+                        'id' => $sub->id,
+                        'name' => $sub->name,
+                        'slug' => $sub->slug,
                         'image' => $sub->image,
                     ]),
                 ]),
-            'popularSearches' => \Illuminate\Support\Facades\DB::table('search_logs')
+            'popularSearches' => DB::table('search_logs')
                 ->orderByDesc('count')
                 ->limit(6)
                 ->pluck('query'),
             'authCustomer' => function () use ($request) {
                 $id = $request->session()->get('customer_id');
-                if (!$id) return null;
+                if (! $id) {
+                    return null;
+                }
                 $c = Customer::find($id);
+
                 return $c ? ['first_name' => $c->first_name, 'email' => $c->email] : null;
             },
             'wishlistIds' => function () use ($request) {
                 $id = $request->session()->get('customer_id');
-                if (!$id) return [];
+                if (! $id) {
+                    return [];
+                }
+
                 return Wishlist::where('customer_id', $id)->pluck('product_id')->toArray();
             },
-            'settings'  => [
-                'meta_pixel_id'   => Setting::get('meta_pixel_id'),
+            'settings' => [
+                'meta_pixel_id' => Setting::get('meta_pixel_id'),
                 'tiktok_pixel_id' => Setting::get('tiktok_pixel_id'),
-                'ga4_id'          => Setting::get('ga4_id'),
-                'shop_name'       => Setting::get('shop_name', 'SoukJannah'),
+                'ga4_id' => Setting::get('ga4_id'),
+                'shop_name' => Setting::get('shop_name', 'SoukJannah'),
             ],
+            /** Affichage public (footer, contact, légal) — aligné sur MAIL_FROM_ADDRESS */
+            'supportEmail' => config('mail.from.address'),
+            'siteHost' => parse_url((string) config('app.url', 'http://localhost'), PHP_URL_HOST) ?: '',
         ];
     }
 }

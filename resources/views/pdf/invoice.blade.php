@@ -174,7 +174,7 @@
         <div class="address-block">
             <div class="address-title">Vendeur</div>
             <div class="address-name">SoukJannah</div>
-            <div class="address-line">support@elyesnaitliman.ch</div>
+            <div class="address-line">{{ config('mail.from.address') }}</div>
             <div class="address-line">Suisse</div>
         </div>
         <div class="address-block" style="text-align:right;">
@@ -271,7 +271,10 @@
     <!-- Pied de page -->
     <div class="footer">
         <strong>SoukJannah</strong> — Votre boutique d'essentiels halal premium<br>
-        support@elyesnaitliman.ch · soukjannah.com<br>
+        @php
+            $publicHost = parse_url(config('app.url'), PHP_URL_HOST) ?: 'soukjannah.com';
+        @endphp
+        {{ config('mail.from.address') }} · {{ $publicHost }}<br>
         Ce document est une facture officielle. Merci pour votre confiance.
     </div>
 

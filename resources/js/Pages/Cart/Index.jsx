@@ -102,7 +102,9 @@ export default function CartIndex({ cart }) {
     if (cart.items.length === 0) {
         return (
             <PublicLayout>
-                <Head title={t('cart_title')} />
+                <Head title={`${t('cart_title')} — SoukJannah`}>
+                    <meta head-key="description" name="description" content={t('meta_cart')} />
+                </Head>
                 <div className="max-w-xl mx-auto px-4 py-32 text-center">
                     <div className="h-px w-10 mx-auto mb-10" style={{ backgroundColor: '#C8A96E' }}></div>
                     <h1 className="font-serif text-3xl font-normal mb-4" style={{ color: '#1A1A1A' }}>{t('cart_empty_title')}</h1>
@@ -115,8 +117,9 @@ export default function CartIndex({ cart }) {
 
     return (
         <PublicLayout>
-            <Head title={t('cart_title')} />
-
+            <Head title={`${t('cart_title')} — SoukJannah`}>
+                <meta head-key="description" name="description" content={t('meta_cart')} />
+            </Head>
             <section className="border-b py-12 text-center" style={{ backgroundColor: '#F0EBE1', borderColor: '#E8E2D9' }}>
                 <p className="text-xs tracking-[0.4em] uppercase mb-3 font-light" style={{ color: '#C8A96E' }}>{t('cart_tag')}</p>
                 <h1 className="font-serif text-3xl font-normal" style={{ color: '#1A1A1A' }}>

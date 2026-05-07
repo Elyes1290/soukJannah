@@ -38,8 +38,9 @@ export default function BlogIndex({ posts }) {
     const { t } = useT();
     return (
         <PublicLayout>
-            <Head title={`${t('blog_title')} — Islamic Lifestyle & Inspiration`} />
-
+            <Head title={`${t('blog_title')} — SoukJannah`}>
+                <meta head-key="description" name="description" content={t('meta_blog_default')} />
+            </Head>
             <section className="py-20 text-center border-b" style={{ backgroundColor: '#FAF8F4', borderColor: '#E8E2D9' }}>
                 <div className="max-w-2xl mx-auto px-4">
                     <p className="text-xs tracking-[0.4em] uppercase mb-4 font-light" style={{ color: '#C8A96E' }}>{t('blog_tag')}</p>

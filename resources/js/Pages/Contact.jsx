@@ -4,7 +4,7 @@ import { useT } from '../contexts/LanguageContext';
 
 export default function Contact() {
     const { t } = useT();
-    const { flash } = usePage().props;
+    const { flash, supportEmail } = usePage().props;
     const sent = flash?.contact_success || false;
 
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -38,7 +38,7 @@ export default function Contact() {
                 </svg>
             ),
             label: t('contact_email_label'),
-            value: 'support@elyesnaitliman.ch',
+            value: supportEmail || 'support@soukjannah.com',
         },
         {
             icon: (
@@ -70,8 +70,9 @@ export default function Contact() {
 
     return (
         <PublicLayout>
-            <Head title={`${t('contact_title')} — SoukJannah`} />
-
+            <Head title={`${t('contact_title')} — SoukJannah`}>
+                <meta head-key="description" name="description" content={t('meta_contact')} />
+            </Head>
             <section className="border-b py-24 text-center" style={{ backgroundColor: '#F0EBE1', borderColor: '#E8E2D9' }}>
                 <p className="text-xs tracking-[0.4em] uppercase mb-5 font-light" style={{ color: '#C8A96E' }}>{t('contact_tag')}</p>
                 <h1 className="font-serif text-4xl md:text-5xl font-normal mb-4" style={{ color: '#1A1A1A' }}>{t('contact_h1')}</h1>

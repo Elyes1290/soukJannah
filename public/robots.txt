@@ -5,4 +5,4 @@ Disallow: /admin/
 Disallow: /panier
 Disallow: /checkout
 
-Sitemap: https://halalswissshop.elyesnaitliman.ch/sitemap.xml
+Sitemap: https://soukjannah.com/sitemap.xml

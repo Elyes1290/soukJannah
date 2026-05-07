@@ -59,8 +59,9 @@ export default function Faq() {
 
     return (
         <PublicLayout>
-            <Head title={`${t('faq_title')} — SoukJannah`} />
-
+            <Head title={`${t('faq_title')} — SoukJannah`}>
+                <meta head-key="description" name="description" content={t('meta_faq')} />
+            </Head>
             {/* Fil d'ariane */}
             <div className="border-b" style={{ borderColor: '#E8E2D9', backgroundColor: '#FAF8F4' }}>
                 <div className="max-w-3xl mx-auto px-4 py-3">

@@ -270,6 +270,7 @@ export default function ShopShow({ product, auth }) {
         <PublicLayout>
             {lightboxOpen && <Lightbox src={selectedImage} alt={product.name} onClose={() => setLightboxOpen(false)} />}
             <Head title={`${product.name} — SoukJannah`}>
+                <meta head-key="description" name="description" content={(product.og?.description || product.short_description || product.name).slice(0, 170)} />
                 <meta head-key="og:type"        property="og:type"        content="product" />
                 <meta head-key="og:title"       property="og:title"       content={product.og.title} />
                 <meta head-key="og:description" property="og:description" content={product.og.description} />

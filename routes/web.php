@@ -1,40 +1,48 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DiscountCodeController;
 use App\Http\Controllers\Admin\FeaturedOfferController;
+use App\Http\Controllers\Admin\NewsletterAdminController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PostController as AdminPostController;
-use App\Http\Controllers\Admin\ReviewController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ReturnController;
+use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Blog\PostController as BlogPostController;
 use App\Http\Controllers\CartController;
-use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\SitemapController;
-use App\Http\Controllers\WebhookController;
-use App\Http\Controllers\Shop\ProductController as ShopProductController;
-use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Customer\SocialAuthController;
-use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\Customer\WishlistController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DiscountController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\Shop\ProductController as ShopProductController;
+use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\StockAlertController;
+use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\WebhookController;
+use App\Http\Middleware\AdminMiddleware;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 // Cron HTTP (pour Infomaniak planificateur de tâches)
-Route::get('/cron/abandoned-carts', function (\Illuminate\Http\Request $request) {
+Route::get('/cron/abandoned-carts', function (Request $request) {
     $token = config('services.cron.token');
-    if (!$token || $request->query('token') !== $token) {
+    if (! $token || $request->query('token') !== $token) {
         abort(403);
     }
-    \Illuminate\Support\Facades\Artisan::call('shop:abandoned-carts');
-    return response('OK — ' . now(), 200);
+    Artisan::call('shop:abandoned-carts');
+
+    return response('OK — '.now(), 200);
 })->name('cron.abandoned-carts');
 
 // Sitemap
@@ -64,12 +72,12 @@ Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.s
 Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
 Route::get('/checkout/cancel', [CheckoutController::class, 'cancel'])->name('checkout.cancel');
 
-Route::get('/a-propos', fn() => Inertia::render('About'))->name('about');
-Route::get('/contact', fn() => Inertia::render('Contact'))->name('contact');
-Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');
-Route::get('/livraison', fn() => Inertia::render('Livraison'))->name('livraison');
-Route::get('/faq', fn() => Inertia::render('Faq'))->name('faq');
-Route::get('/mentions-legales', fn() => Inertia::render('MentionsLegales'))->name('mentions-legales');
+Route::get('/a-propos', fn () => Inertia::render('About'))->name('about');
+Route::get('/contact', fn () => Inertia::render('Contact'))->name('contact');
+Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
+Route::get('/livraison', fn () => Inertia::render('Livraison'))->name('livraison');
+Route::get('/faq', fn () => Inertia::render('Faq'))->name('faq');
+Route::get('/mentions-legales', fn () => Inertia::render('MentionsLegales'))->name('mentions-legales');
 
 // Espace client — public
 // Suivi de commande public
@@ -77,7 +85,7 @@ Route::get('/suivi', [TrackingController::class, 'index'])->name('tracking.index
 Route::post('/suivi', [TrackingController::class, 'track'])->name('tracking.track');
 
 // Alerte retour en stock
-Route::post('/stock-alert/subscribe', [\App\Http\Controllers\StockAlertController::class, 'subscribe'])->name('stock-alert.subscribe');
+Route::post('/stock-alert/subscribe', [StockAlertController::class, 'subscribe'])->name('stock-alert.subscribe');
 
 // Newsletter
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
@@ -88,37 +96,41 @@ Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect'
 Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback'])->name('social.callback');
 
 Route::get('/mon-compte/connexion', [CustomerController::class, 'showLogin'])->name('customer.login');
-Route::post('/mon-compte/connexion', [CustomerController::class, 'login'])->name('customer.login.post');
+Route::post('/mon-compte/connexion', [CustomerController::class, 'login'])
+    ->middleware('throttle:auth-forms')
+    ->name('customer.login.post');
 Route::get('/mon-compte/inscription', [CustomerController::class, 'showRegister'])->name('customer.register');
-Route::post('/mon-compte/inscription', [CustomerController::class, 'register'])->name('customer.register.post');
+Route::post('/mon-compte/inscription', [CustomerController::class, 'register'])
+    ->middleware('throttle:auth-forms')
+    ->name('customer.register.post');
 Route::post('/mon-compte/deconnexion', [CustomerController::class, 'logout'])->name('customer.logout');
 Route::get('/mon-compte/verifier/{token}', [CustomerController::class, 'verify'])->name('customer.verify');
 Route::get('/mon-compte/verification-envoyee', [CustomerController::class, 'checkEmail'])->name('customer.check-email');
 
 // Espace client — protégé
 Route::middleware('customer')->group(function () {
-    Route::get('/mon-compte',            [CustomerController::class, 'dashboard'])->name('customer.dashboard');
-    Route::get('/mon-compte/commandes',  [CustomerController::class, 'orders'])->name('customer.orders');
-    Route::get('/mon-compte/profil',     [CustomerController::class, 'showProfile'])->name('customer.profile');
-    Route::post('/mon-compte/profil',    [CustomerController::class, 'updateProfile'])->name('customer.profile.update');
-    Route::get('/mon-compte/securite',   [CustomerController::class, 'showSecurity'])->name('customer.security');
+    Route::get('/mon-compte', [CustomerController::class, 'dashboard'])->name('customer.dashboard');
+    Route::get('/mon-compte/commandes', [CustomerController::class, 'orders'])->name('customer.orders');
+    Route::get('/mon-compte/profil', [CustomerController::class, 'showProfile'])->name('customer.profile');
+    Route::post('/mon-compte/profil', [CustomerController::class, 'updateProfile'])->name('customer.profile.update');
+    Route::get('/mon-compte/securite', [CustomerController::class, 'showSecurity'])->name('customer.security');
     Route::post('/mon-compte/mot-de-passe', [CustomerController::class, 'updatePassword'])->name('customer.password.update');
 
     // Adresses
-    Route::get('/mon-compte/adresses',                          [CustomerController::class, 'showAddresses'])->name('customer.addresses');
-    Route::post('/mon-compte/adresses',                         [CustomerController::class, 'storeAddress'])->name('customer.addresses.store');
-    Route::put('/mon-compte/adresses/{address}',                [CustomerController::class, 'updateAddress'])->name('customer.addresses.update');
-    Route::delete('/mon-compte/adresses/{address}',             [CustomerController::class, 'destroyAddress'])->name('customer.addresses.destroy');
-    Route::post('/mon-compte/adresses/{address}/default',       [CustomerController::class, 'setDefaultAddress'])->name('customer.addresses.default');
+    Route::get('/mon-compte/adresses', [CustomerController::class, 'showAddresses'])->name('customer.addresses');
+    Route::post('/mon-compte/adresses', [CustomerController::class, 'storeAddress'])->name('customer.addresses.store');
+    Route::put('/mon-compte/adresses/{address}', [CustomerController::class, 'updateAddress'])->name('customer.addresses.update');
+    Route::delete('/mon-compte/adresses/{address}', [CustomerController::class, 'destroyAddress'])->name('customer.addresses.destroy');
+    Route::post('/mon-compte/adresses/{address}/default', [CustomerController::class, 'setDefaultAddress'])->name('customer.addresses.default');
 
     // Avis
     Route::get('/mon-compte/commandes/{order}/facture', [InvoiceController::class, 'customerDownload'])->name('customer.invoice');
 
     // Wishlist
-    Route::get('/mon-compte/favoris', [\App\Http\Controllers\Customer\WishlistController::class, 'index'])->name('customer.wishlist');
-    Route::post('/mon-compte/favoris/toggle', [\App\Http\Controllers\Customer\WishlistController::class, 'toggle'])->name('customer.wishlist.toggle');
-    Route::get('/mon-compte/avis',   [CustomerController::class, 'showReviews'])->name('customer.reviews');
-    Route::post('/mon-compte/avis',  [CustomerController::class, 'storeReview'])->name('customer.reviews.store');
+    Route::get('/mon-compte/favoris', [WishlistController::class, 'index'])->name('customer.wishlist');
+    Route::post('/mon-compte/favoris/toggle', [WishlistController::class, 'toggle'])->name('customer.wishlist.toggle');
+    Route::get('/mon-compte/avis', [CustomerController::class, 'showReviews'])->name('customer.reviews');
+    Route::post('/mon-compte/avis', [CustomerController::class, 'storeReview'])->name('customer.reviews.store');
 
     // Codes promo
     Route::get('/mon-compte/promos', [CustomerController::class, 'showPromos'])->name('customer.promos');
@@ -133,14 +145,16 @@ Route::post('/webhook/stripe', [WebhookController::class, 'handle'])->name('webh
 // Auth admin
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    Route::post('/login', [AuthController::class, 'login'])
+        ->middleware('throttle:auth-forms')
+        ->name('login.post');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/2fa', [AuthController::class, 'showTwoFactor'])->name('2fa');
     Route::post('/2fa/verify', [AuthController::class, 'verifyTwoFactor'])->name('2fa.verify');
     Route::post('/2fa/resend', [AuthController::class, 'resendTwoFactor'])->name('2fa.resend');
 
     // Routes protégées admin
-    Route::middleware(\App\Http\Middleware\AdminMiddleware::class)->group(function () {
+    Route::middleware(AdminMiddleware::class)->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
         // Produits
@@ -186,9 +200,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('/offres/{featuredOffer}', [FeaturedOfferController::class, 'destroy'])->name('featured-offers.destroy');
 
         // Newsletter
-        Route::get('/newsletter', [\App\Http\Controllers\Admin\NewsletterAdminController::class, 'index'])->name('newsletter.index');
-        Route::delete('/newsletter/{subscriber}', [\App\Http\Controllers\Admin\NewsletterAdminController::class, 'destroy'])->name('newsletter.destroy');
-        Route::get('/newsletter/export', [\App\Http\Controllers\Admin\NewsletterAdminController::class, 'export'])->name('newsletter.export');
+        Route::get('/newsletter', [NewsletterAdminController::class, 'index'])->name('newsletter.index');
+        Route::delete('/newsletter/{subscriber}', [NewsletterAdminController::class, 'destroy'])->name('newsletter.destroy');
+        Route::get('/newsletter/export', [NewsletterAdminController::class, 'export'])->name('newsletter.export');
 
         Route::get('/avis', [ReviewController::class, 'index'])->name('reviews.index');
         Route::post('/avis', [ReviewController::class, 'store'])->name('reviews.store');

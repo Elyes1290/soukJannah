@@ -175,6 +175,24 @@ export const translations = {
         checkout_cancel_desc: 'Your cart has been preserved. You can try again whenever you like.',
         checkout_cancel_cta: 'Back to cart',
 
+        // Meta descriptions (SEO)
+        meta_home: 'Premium Muslim essentials: prayer rugs, gift sets and elegant accessories at SoukJannah.',
+        meta_shop_default: 'Discover premium curated halal products at SoukJannah — skincare, perfumes, décor and gifts.',
+        meta_blog_default: 'Islamic lifestyle articles, guides and inspiration from SoukJannah.',
+        meta_contact: 'Contact SoukJannah for help with orders, delivery or products.',
+        meta_about: 'About SoukJannah — our vision for refined Muslim essentials.',
+        meta_faq: 'FAQ: shipping, halal sourcing, exchanges and SoukJannah services.',
+        meta_delivery: 'Delivery and returns policies for Switzerland and neighbouring countries.',
+        meta_legal: 'Legal notice, terms of sale and privacy — SoukJannah.',
+        meta_cart: 'Your shopping cart at SoukJannah.',
+        meta_checkout: 'Secure Stripe checkout — SoukJannah.',
+        meta_tracking: 'Track your SoukJannah order with your CMD number and email.',
+
+        // Order tracking messages
+        tracking_err_unknown_order: 'No order matches this number. Check the reference (e.g. CMD-A1B2C3).',
+        tracking_err_email_mismatch: 'That email isn’t linked to this order — use the same address from your confirmation email.',
+        tracking_page_title: 'Order tracking',
+
         // Blog
         blog_title: 'Blog',
         blog_tag: 'Journal',
@@ -689,6 +707,24 @@ export const translations = {
         checkout_cancel_h1: 'Paiement annulé',
         checkout_cancel_desc: 'Votre panier a été conservé. Vous pouvez réessayer quand vous le souhaitez.',
         checkout_cancel_cta: 'Retour au panier',
+
+        // Meta descriptions (SEO)
+        meta_home: 'Essentiels musulmans premium : tapis de prière, coffrets et accessoires élégants — SoukJannah.',
+        meta_shop_default: 'Découvrez la boutique SoukJannah : produits halal sélectionnés, soins, parfums, déco et cadeaux.',
+        meta_blog_default: 'Articles lifestyle islamique et inspiration — SoukJannah.',
+        meta_contact: 'Contactez SoukJannah pour vos questions commandes, livraison ou produits.',
+        meta_about: 'À propos de SoukJannah et notre vision des essentiels musulmans raffinés.',
+        meta_faq: 'FAQ : livraison, produits halal, retours et services SoukJannah.',
+        meta_delivery: 'Livraisons et retours — délais et pays desservis par SoukJannah.',
+        meta_legal: 'Mentions légales, CGV et confidentialité — SoukJannah.',
+        meta_cart: 'Votre panier SoukJannah.',
+        meta_checkout: 'Paiement sécurisé par Stripe — SoukJannah.',
+        meta_tracking: 'Suivi de votre commande SoukJannah avec le numéro CMD et votre email.',
+
+        // Suivi commande — erreurs
+        tracking_err_unknown_order: 'Aucune commande ne correspond à ce numéro. Vérifiez la référence (ex. CMD-A1B2C3).',
+        tracking_err_email_mismatch: 'Cette adresse email ne correspond pas à celle de la commande — utilisez celle du mail de confirmation.',
+        tracking_page_title: 'Suivi de commande',
 
         // Blog
         blog_title: 'Blog',

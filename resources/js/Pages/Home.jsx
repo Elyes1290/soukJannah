@@ -54,8 +54,8 @@ export default function Home({ featured, categories = [], featuredOffers = [], r
     return (
         <PublicLayout>
             <Head>
-                <title>SoukJannah — Premium Muslim essentials</title>
-                <meta name="description" content="Discover our selection of modern and elegant Muslim essentials. Premium prayer rugs, Islamic gift sets and more." />
+                <title>{lang === 'fr' ? 'SoukJannah — Essentiels musulmans premium' : 'SoukJannah — Premium Muslim essentials'}</title>
+                <meta name="description" content={t('meta_home')} />
             </Head>
 
             {/* Hero */}

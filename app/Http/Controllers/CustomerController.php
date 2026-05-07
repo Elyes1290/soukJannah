@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\CustomerVerificationMail;
-use App\Mail\ReturnDecisionMail;
+use App\Mail\CustomerWelcomeMail;
 use App\Mail\ReturnRequestMail;
 use App\Models\Customer;
 use App\Models\CustomerAddress;
@@ -27,6 +27,7 @@ class CustomerController extends Controller
         $customerId = session('customer_id');
         if ($customerId && Customer::find($customerId)) {
             $redirect = $request->query('redirect');
+
             return redirect($redirect && str_starts_with($redirect, '/') ? $redirect : route('customer.dashboard'));
         }
 
@@ -43,7 +44,7 @@ class CustomerController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email'    => 'required|email',
+            'email' => 'required|email',
             'password' => 'required|string',
         ]);
 
@@ -51,11 +52,11 @@ class CustomerController extends Controller
             ->whereNotNull('password')
             ->first();
 
-        if (!$customer || !Hash::check($request->password, $customer->password)) {
+        if (! $customer || ! Hash::check($request->password, $customer->password)) {
             return back()->withErrors(['email' => 'Email ou mot de passe incorrect.']);
         }
 
-        if (!$customer->isVerified()) {
+        if (! $customer->isVerified()) {
             return back()->withErrors(['email' => 'Veuillez vérifier votre adresse email avant de vous connecter. Consultez votre boîte mail.']);
         }
 
@@ -73,6 +74,7 @@ class CustomerController extends Controller
     public function logout(Request $request)
     {
         $request->session()->forget('customer_id');
+
         return redirect()->route('customer.login');
     }
 
@@ -83,6 +85,7 @@ class CustomerController extends Controller
         if (session('customer_id')) {
             return redirect()->route('customer.dashboard');
         }
+
         return Inertia::render('Customer/Register');
     }
 
@@ -90,13 +93,13 @@ class CustomerController extends Controller
     {
         $request->validate([
             'first_name' => 'required|string|max:100',
-            'last_name'  => 'required|string|max:100',
-            'email'      => 'required|email',
-            'password'   => 'required|string|min:8|confirmed',
+            'last_name' => 'required|string|max:100',
+            'email' => 'required|email',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         $locale = $request->input('locale', 'en');
-        $token  = Str::random(64);
+        $token = Str::random(64);
 
         $customer = Customer::where('email', $request->email)->first();
 
@@ -105,23 +108,23 @@ class CustomerController extends Controller
                 return back()->withErrors(['email' => 'Un compte existe déjà avec cette adresse email. Connectez-vous.']);
             }
             $customer->update([
-                'first_name'                => $request->first_name,
-                'last_name'                 => $request->last_name,
-                'password'                  => Hash::make($request->password),
-                'email_verified_at'         => null,
-                'email_verification_token'  => $token,
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'password' => Hash::make($request->password),
+                'email_verified_at' => null,
+                'email_verification_token' => $token,
             ]);
         } else {
             $customer = Customer::create([
-                'first_name'                => $request->first_name,
-                'last_name'                 => $request->last_name,
-                'email'                     => $request->email,
-                'password'                  => Hash::make($request->password),
-                'email_verification_token'  => $token,
-                'address'                   => '',
-                'city'                      => '',
-                'postal_code'               => '',
-                'country'                   => 'CH',
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'email_verification_token' => $token,
+                'address' => '',
+                'city' => '',
+                'postal_code' => '',
+                'country' => 'CH',
             ]);
         }
 
@@ -132,7 +135,7 @@ class CustomerController extends Controller
                 new CustomerVerificationMail($customer, $verificationUrl, $locale)
             );
         } catch (\Exception $e) {
-            Log::error('Verification email failed: ' . $e->getMessage());
+            Log::error('Verification email failed: '.$e->getMessage());
         }
 
         return redirect()->route('customer.check-email')
@@ -152,15 +155,24 @@ class CustomerController extends Controller
     {
         $customer = Customer::where('email_verification_token', $token)->first();
 
-        if (!$customer) {
+        if (! $customer) {
             return redirect()->route('customer.login')
                 ->with('error', 'Lien de vérification invalide ou expiré.');
         }
 
         $customer->update([
-            'email_verified_at'         => now(),
-            'email_verification_token'  => null,
+            'email_verified_at' => now(),
+            'email_verification_token' => null,
         ]);
+
+        $pref = strtolower((string) $request->getPreferredLanguage(['fr', 'fr-CH', 'en', 'en-US']) ?? '');
+        $locale = str_starts_with($pref, 'fr') ? 'fr' : 'en';
+
+        try {
+            Mail::to($customer->email)->send(new CustomerWelcomeMail($customer->fresh(), $locale));
+        } catch (\Exception $e) {
+            Log::error('Welcome email failed: '.$e->getMessage());
+        }
 
         $request->session()->put('customer_id', $customer->id);
         $request->session()->regenerate();
@@ -174,18 +186,18 @@ class CustomerController extends Controller
     public function dashboard(Request $request)
     {
         $customer = Customer::findOrFail(session('customer_id'));
-        $orders   = $this->getCustomerOrders($customer);
+        $orders = $this->getCustomerOrders($customer);
 
         $stats = [
-            'total'   => $orders->count(),
+            'total' => $orders->count(),
             'shipped' => $orders->whereIn('status', ['shipped', 'delivered'])->count(),
-            'spent'   => $orders->whereIn('status', ['paid', 'preparing', 'shipped', 'delivered'])->sum('total'),
+            'spent' => $orders->whereIn('status', ['paid', 'preparing', 'shipped', 'delivered'])->sum('total'),
         ];
 
         return Inertia::render('Customer/Dashboard', [
             'customer' => $this->customerData($customer),
-            'orders'   => $orders->values(),
-            'stats'    => $stats,
+            'orders' => $orders->values(),
+            'stats' => $stats,
         ]);
     }
 
@@ -194,11 +206,11 @@ class CustomerController extends Controller
     public function orders(Request $request)
     {
         $customer = Customer::findOrFail(session('customer_id'));
-        $orders   = $this->getCustomerOrders($customer);
+        $orders = $this->getCustomerOrders($customer);
 
         return Inertia::render('Customer/Orders', [
             'customer' => $this->customerData($customer),
-            'orders'   => $orders->values(),
+            'orders' => $orders->values(),
         ]);
     }
 
@@ -219,14 +231,14 @@ class CustomerController extends Controller
 
         $request->validate([
             'first_name' => 'required|string|max:100',
-            'last_name'  => 'required|string|max:100',
-            'phone'      => 'nullable|string|max:30',
+            'last_name' => 'required|string|max:100',
+            'phone' => 'nullable|string|max:30',
         ]);
 
         $customer->update([
             'first_name' => $request->first_name,
-            'last_name'  => $request->last_name,
-            'phone'      => $request->phone ?? '',
+            'last_name' => $request->last_name,
+            'phone' => $request->phone ?? '',
         ]);
 
         return back()->with('success', 'Profil mis à jour.');
@@ -239,8 +251,8 @@ class CustomerController extends Controller
         $customer = Customer::findOrFail(session('customer_id'));
 
         return Inertia::render('Customer/Security', [
-            'customer'     => $this->customerData($customer),
-            'has_password' => !is_null($customer->password),
+            'customer' => $this->customerData($customer),
+            'has_password' => ! is_null($customer->password),
         ]);
     }
 
@@ -254,16 +266,17 @@ class CustomerController extends Controller
                 'password' => 'required|string|min:8|confirmed',
             ]);
             $customer->update(['password' => Hash::make($request->password)]);
+
             return back()->with('success', 'Mot de passe défini avec succès.');
         }
 
         // Customer with existing password: require current password
         $request->validate([
             'current_password' => 'required|string',
-            'password'         => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
-        if (!Hash::check($request->current_password, $customer->password)) {
+        if (! Hash::check($request->current_password, $customer->password)) {
             return back()->withErrors(['current_password' => 'Mot de passe actuel incorrect.']);
         }
 
@@ -276,14 +289,14 @@ class CustomerController extends Controller
 
     public function showAddresses(Request $request)
     {
-        $customer  = Customer::findOrFail(session('customer_id'));
+        $customer = Customer::findOrFail(session('customer_id'));
         $addresses = CustomerAddress::where('customer_id', $customer->id)
             ->orderByDesc('is_default')
             ->orderBy('id')
             ->get();
 
         return Inertia::render('Customer/Addresses', [
-            'customer'  => $this->customerData($customer),
+            'customer' => $this->customerData($customer),
             'addresses' => $addresses,
         ]);
     }
@@ -293,16 +306,16 @@ class CustomerController extends Controller
         $customer = Customer::findOrFail(session('customer_id'));
 
         $request->validate([
-            'label'       => 'nullable|string|max:60',
-            'first_name'  => 'required|string|max:100',
-            'last_name'   => 'required|string|max:100',
-            'address'     => 'required|string|max:255',
-            'address2'    => 'nullable|string|max:255',
-            'city'        => 'required|string|max:100',
+            'label' => 'nullable|string|max:60',
+            'first_name' => 'required|string|max:100',
+            'last_name' => 'required|string|max:100',
+            'address' => 'required|string|max:255',
+            'address2' => 'nullable|string|max:255',
+            'city' => 'required|string|max:100',
             'postal_code' => 'required|string|max:20',
-            'country'     => 'required|string|size:2',
-            'phone'       => 'nullable|string|max:30',
-            'is_default'  => 'boolean',
+            'country' => 'required|string|size:2',
+            'phone' => 'nullable|string|max:30',
+            'is_default' => 'boolean',
         ]);
 
         if ($request->boolean('is_default')) {
@@ -313,16 +326,16 @@ class CustomerController extends Controller
 
         CustomerAddress::create([
             'customer_id' => $customer->id,
-            'label'       => $request->label ?: 'Domicile',
-            'first_name'  => $request->first_name,
-            'last_name'   => $request->last_name,
-            'address'     => $request->address,
-            'address2'    => $request->address2,
-            'city'        => $request->city,
+            'label' => $request->label ?: 'Domicile',
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'address' => $request->address,
+            'address2' => $request->address2,
+            'city' => $request->city,
             'postal_code' => $request->postal_code,
-            'country'     => strtoupper($request->country),
-            'phone'       => $request->phone,
-            'is_default'  => $isFirst || $request->boolean('is_default'),
+            'country' => strtoupper($request->country),
+            'phone' => $request->phone,
+            'is_default' => $isFirst || $request->boolean('is_default'),
         ]);
 
         return back()->with('success', 'Adresse ajoutée.');
@@ -334,16 +347,16 @@ class CustomerController extends Controller
         abort_if($address->customer_id !== $customer->id, 403);
 
         $request->validate([
-            'label'       => 'nullable|string|max:60',
-            'first_name'  => 'required|string|max:100',
-            'last_name'   => 'required|string|max:100',
-            'address'     => 'required|string|max:255',
-            'address2'    => 'nullable|string|max:255',
-            'city'        => 'required|string|max:100',
+            'label' => 'nullable|string|max:60',
+            'first_name' => 'required|string|max:100',
+            'last_name' => 'required|string|max:100',
+            'address' => 'required|string|max:255',
+            'address2' => 'nullable|string|max:255',
+            'city' => 'required|string|max:100',
             'postal_code' => 'required|string|max:20',
-            'country'     => 'required|string|size:2',
-            'phone'       => 'nullable|string|max:30',
-            'is_default'  => 'boolean',
+            'country' => 'required|string|size:2',
+            'phone' => 'nullable|string|max:30',
+            'is_default' => 'boolean',
         ]);
 
         if ($request->boolean('is_default')) {
@@ -351,16 +364,16 @@ class CustomerController extends Controller
         }
 
         $address->update([
-            'label'       => $request->label ?: 'Domicile',
-            'first_name'  => $request->first_name,
-            'last_name'   => $request->last_name,
-            'address'     => $request->address,
-            'address2'    => $request->address2,
-            'city'        => $request->city,
+            'label' => $request->label ?: 'Domicile',
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'address' => $request->address,
+            'address2' => $request->address2,
+            'city' => $request->city,
             'postal_code' => $request->postal_code,
-            'country'     => strtoupper($request->country),
-            'phone'       => $request->phone,
-            'is_default'  => $request->boolean('is_default'),
+            'country' => strtoupper($request->country),
+            'phone' => $request->phone,
+            'is_default' => $request->boolean('is_default'),
         ]);
 
         return back()->with('success', 'Adresse mise à jour.');
@@ -371,6 +384,7 @@ class CustomerController extends Controller
         $customer = Customer::findOrFail(session('customer_id'));
         abort_if($address->customer_id !== $customer->id, 403);
         $address->delete();
+
         return back()->with('success', 'Adresse supprimée.');
     }
 
@@ -380,6 +394,7 @@ class CustomerController extends Controller
         abort_if($address->customer_id !== $customer->id, 403);
         CustomerAddress::where('customer_id', $customer->id)->update(['is_default' => false]);
         $address->update(['is_default' => true]);
+
         return back()->with('success', 'Adresse par défaut mise à jour.');
     }
 
@@ -393,12 +408,12 @@ class CustomerController extends Controller
             ->where('customer_id', $customer->id)
             ->latest()
             ->get()
-            ->map(fn($r) => [
-                'id'           => $r->id,
-                'rating'       => $r->rating,
-                'content'      => $r->content,
-                'is_active'    => $r->is_active,
-                'created_at'   => $r->created_at->format('d/m/Y'),
+            ->map(fn ($r) => [
+                'id' => $r->id,
+                'rating' => $r->rating,
+                'content' => $r->content,
+                'is_active' => $r->is_active,
+                'created_at' => $r->created_at->format('d/m/Y'),
                 'product_name' => $r->product?->name,
                 'product_slug' => $r->product?->slug,
             ]);
@@ -409,7 +424,7 @@ class CustomerController extends Controller
         $deliveredOrders = Order::with('items')
             ->where(function ($q) use ($customer) {
                 $q->where('customer_id', $customer->id)
-                  ->orWhereHas('customer', fn($sq) => $sq->where('email', $customer->email));
+                    ->orWhereHas('customer', fn ($sq) => $sq->where('email', $customer->email));
             })
             ->whereIn('status', ['shipped', 'delivered'])
             ->latest()
@@ -419,22 +434,28 @@ class CustomerController extends Controller
         $reviewableProducts = collect();
         foreach ($deliveredOrders as $order) {
             foreach ($order->items as $item) {
-                if (!$item->product_id) continue;
-                if ($reviewedProductIds->contains($item->product_id)) continue;
+                if (! $item->product_id) {
+                    continue;
+                }
+                if ($reviewedProductIds->contains($item->product_id)) {
+                    continue;
+                }
                 // Éviter les doublons si produit commandé dans plusieurs commandes
-                if ($reviewableProducts->contains('product_id', $item->product_id)) continue;
+                if ($reviewableProducts->contains('product_id', $item->product_id)) {
+                    continue;
+                }
                 $reviewableProducts->push([
-                    'product_id'   => $item->product_id,
+                    'product_id' => $item->product_id,
                     'product_name' => $item->product_name,
-                    'order_id'     => $order->id,
+                    'order_id' => $order->id,
                     'order_number' => $order->number,
                 ]);
             }
         }
 
         return Inertia::render('Customer/Reviews', [
-            'customer'           => $this->customerData($customer),
-            'reviews'            => $myReviews,
+            'customer' => $this->customerData($customer),
+            'reviews' => $myReviews,
             'reviewableProducts' => $reviewableProducts->values(),
         ]);
     }
@@ -445,20 +466,20 @@ class CustomerController extends Controller
 
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'order_id'   => 'required|exists:orders,id',
-            'rating'     => 'required|integer|min:1|max:5',
-            'content'    => 'required|string|min:10|max:1000',
+            'order_id' => 'required|exists:orders,id',
+            'rating' => 'required|integer|min:1|max:5',
+            'content' => 'required|string|min:10|max:1000',
         ]);
 
         // Vérifier que la commande appartient au client
         $order = Order::with('items')->findOrFail($request->order_id);
         $ownsOrder = $order->customer_id === $customer->id
             || ($order->customer && $order->customer->email === $customer->email);
-        abort_if(!$ownsOrder, 403);
+        abort_if(! $ownsOrder, 403);
 
         // Vérifier que le produit était bien dans cette commande
         $hasProduct = $order->items->contains('product_id', (int) $request->product_id);
-        abort_if(!$hasProduct, 403);
+        abort_if(! $hasProduct, 403);
 
         // Un seul avis par produit par client
         $alreadyReviewed = Review::where('customer_id', $customer->id)
@@ -469,13 +490,13 @@ class CustomerController extends Controller
         }
 
         Review::create([
-            'customer_id'       => $customer->id,
-            'order_id'          => $request->order_id,
-            'product_id'        => $request->product_id,
-            'author'            => $customer->first_name . ' ' . substr($customer->last_name, 0, 1) . '.',
-            'rating'            => $request->rating,
-            'content'           => $request->content,
-            'is_active'         => false,
+            'customer_id' => $customer->id,
+            'order_id' => $request->order_id,
+            'product_id' => $request->product_id,
+            'author' => $customer->first_name.' '.substr($customer->last_name, 0, 1).'.',
+            'rating' => $request->rating,
+            'content' => $request->content,
+            'is_active' => false,
             'verified_purchase' => true,
         ]);
 
@@ -497,17 +518,17 @@ class CustomerController extends Controller
             })
             ->select('code', 'type', 'value', 'min_amount', 'expires_at')
             ->get()
-            ->map(fn($c) => [
-                'code'             => $c->code,
-                'type'             => $c->type,
-                'value'            => $c->value,
+            ->map(fn ($c) => [
+                'code' => $c->code,
+                'type' => $c->type,
+                'value' => $c->value,
                 'min_order_amount' => $c->min_amount,
-                'expires_at'       => $c->expires_at?->format('d/m/Y'),
+                'expires_at' => $c->expires_at?->format('d/m/Y'),
             ]);
 
         return Inertia::render('Customer/Promos', [
             'customer' => $this->customerData($customer),
-            'promos'   => $promos,
+            'promos' => $promos,
         ]);
     }
 
@@ -516,30 +537,30 @@ class CustomerController extends Controller
     private function getCustomerOrders(Customer $customer)
     {
         return Order::where(function ($q) use ($customer) {
-                $q->where('customer_id', $customer->id)
-                  ->orWhereHas('customer', fn($sq) => $sq->where('email', $customer->email));
-            })
+            $q->where('customer_id', $customer->id)
+                ->orWhereHas('customer', fn ($sq) => $sq->where('email', $customer->email));
+        })
             ->with(['items', 'returnRequest'])
             ->latest()
             ->get()
-            ->map(fn($o) => [
-                'id'              => $o->id,
-                'number'          => $o->number,
-                'status'          => $o->status,
-                'total'           => $o->total,
-                'shipping'        => $o->shipping,
-                'tracking_number' => $o->tracking_number,
-                'created_at'      => $o->created_at->format('d/m/Y'),
-                'return_request'  => $o->returnRequest ? [
-                    'status'      => $o->returnRequest->status,
-                    'admin_notes' => $o->returnRequest->admin_notes,
-                ] : null,
-                'items'           => $o->items->map(fn($i) => [
-                    'product_name' => $i->product_name,
-                    'quantity'     => $i->quantity,
-                    'total'        => $i->total,
-                ]),
-            ]);
+            ->map(fn ($o) => [
+            'id' => $o->id,
+            'number' => $o->number,
+            'status' => $o->status,
+            'total' => $o->total,
+            'shipping' => $o->shipping,
+            'tracking_number' => $o->tracking_number,
+            'created_at' => $o->created_at->format('d/m/Y'),
+            'return_request' => $o->returnRequest ? [
+                'status' => $o->returnRequest->status,
+                'admin_notes' => $o->returnRequest->admin_notes,
+            ] : null,
+            'items' => $o->items->map(fn ($i) => [
+                'product_name' => $i->product_name,
+                'quantity' => $i->quantity,
+                'total' => $i->total,
+            ]),
+        ]);
     }
 
     // ── Retours ───────────────────────────────────────────────────────────────
@@ -547,14 +568,14 @@ class CustomerController extends Controller
     public function storeReturn(Request $request, Order $order)
     {
         $customerId = (int) session('customer_id');
-        $customer   = Customer::findOrFail($customerId);
+        $customer = Customer::findOrFail($customerId);
         $order->loadMissing('customer');
 
         // Vérifie que la commande appartient au client (par ID ou par email)
         $ownsOrder = (int) $order->customer_id === $customerId
             || ($order->customer && $order->customer->email === $customer->email);
 
-        if (!$ownsOrder || $order->status !== 'delivered') {
+        if (! $ownsOrder || $order->status !== 'delivered') {
             abort(403);
         }
 
@@ -564,16 +585,16 @@ class CustomerController extends Controller
         }
 
         $data = $request->validate([
-            'reason'  => 'required|string|max:255',
+            'reason' => 'required|string|max:255',
             'message' => 'nullable|string|max:1000',
         ]);
 
         $returnRequest = ReturnRequest::create([
-            'order_id'    => $order->id,
+            'order_id' => $order->id,
             'customer_id' => $customerId,
-            'reason'      => $data['reason'],
-            'message'     => $data['message'] ?? null,
-            'status'      => 'pending',
+            'reason' => $data['reason'],
+            'message' => $data['message'] ?? null,
+            'status' => 'pending',
         ]);
 
         // Notification à l'admin
@@ -589,9 +610,9 @@ class CustomerController extends Controller
     {
         return [
             'first_name' => $customer->first_name,
-            'last_name'  => $customer->last_name,
-            'email'      => $customer->email,
-            'phone'      => $customer->phone ?? '',
+            'last_name' => $customer->last_name,
+            'email' => $customer->email,
+            'phone' => $customer->phone ?? '',
         ];
     }
 }

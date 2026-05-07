@@ -7,6 +7,7 @@ use App\Http\Controllers\StockAlertController;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Support\ProductImageProcessor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -20,16 +21,16 @@ class ProductController extends Controller
             ->orderBy('sort_order')
             ->orderByDesc('created_at')
             ->get()
-            ->map(fn($p) => [
-                'id'          => $p->id,
-                'name'        => $p->name,
-                'price'       => $p->price,
-                'sale_price'  => $p->sale_price,
-                'stock'       => $p->stock,
-                'is_active'   => $p->is_active,
+            ->map(fn ($p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'price' => $p->price,
+                'sale_price' => $p->sale_price,
+                'stock' => $p->stock,
+                'is_active' => $p->is_active,
                 'is_featured' => $p->is_featured,
                 'main_image_url' => $p->main_image_url,
-                'category'    => $p->category?->name,
+                'category' => $p->category?->name,
             ]);
 
         return Inertia::render('Admin/Products/Index', compact('products'));
@@ -38,37 +39,38 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Category::where('is_active', true)->orderBy('name')->get(['id', 'name']);
+
         return Inertia::render('Admin/Products/Form', compact('categories'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name'              => 'required|string|max:255',
-            'description'       => 'nullable|string',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'short_description' => 'nullable|string|max:500',
-            'price'             => 'required|numeric|min:0',
-            'sale_price'        => 'nullable|numeric|min:0',
-            'stock'             => 'required|integer|min:0',
-            'sku'               => 'nullable|string|max:100|unique:products',
-            'category_id'       => 'nullable|exists:categories,id',
-            'is_active'         => 'boolean',
-            'is_featured'       => 'boolean',
-            'main_image'        => 'nullable|image|max:4096',
-            'images.*'          => 'nullable|image|max:4096',
+            'price' => 'required|numeric|min:0',
+            'sale_price' => 'nullable|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'sku' => 'nullable|string|max:100|unique:products',
+            'category_id' => 'nullable|exists:categories,id',
+            'is_active' => 'boolean',
+            'is_featured' => 'boolean',
+            'main_image' => 'nullable|image|max:4096',
+            'images.*' => 'nullable|image|max:4096',
         ]);
 
         $data['slug'] = Str::slug($data['name']);
 
         if ($request->hasFile('main_image')) {
-            $data['main_image'] = $request->file('main_image')->store('products', 'public');
+            $data['main_image'] = ProductImageProcessor::store($request->file('main_image'));
         }
 
         $product = Product::create($data);
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $i => $file) {
-                $path = $file->store('products', 'public');
+                $path = ProductImageProcessor::store($file);
                 $product->images()->create(['path' => $path, 'sort_order' => $i]);
             }
         }
@@ -82,21 +84,21 @@ class ProductController extends Controller
         $product->load('images', 'variants');
 
         return Inertia::render('Admin/Products/Form', [
-            'product'    => [
-                'id'                => $product->id,
-                'name'              => $product->name,
-                'description'       => $product->description,
+            'product' => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
                 'short_description' => $product->short_description,
-                'price'             => $product->price,
-                'sale_price'        => $product->sale_price,
-                'stock'             => $product->stock,
-                'sku'               => $product->sku,
-                'category_id'       => $product->category_id,
-                'is_active'         => $product->is_active,
-                'is_featured'       => $product->is_featured,
-                'main_image_url'    => $product->main_image_url,
-                'images'            => $product->images->map(fn($img) => [
-                    'id'  => $img->id,
+                'price' => $product->price,
+                'sale_price' => $product->sale_price,
+                'stock' => $product->stock,
+                'sku' => $product->sku,
+                'category_id' => $product->category_id,
+                'is_active' => $product->is_active,
+                'is_featured' => $product->is_featured,
+                'main_image_url' => $product->main_image_url,
+                'images' => $product->images->map(fn ($img) => [
+                    'id' => $img->id,
                     'url' => $img->url,
                 ]),
             ],
@@ -107,18 +109,18 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $data = $request->validate([
-            'name'              => 'required|string|max:255',
-            'description'       => 'nullable|string',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'short_description' => 'nullable|string|max:500',
-            'price'             => 'required|numeric|min:0',
-            'sale_price'        => 'nullable|numeric|min:0',
-            'stock'             => 'required|integer|min:0',
-            'sku'               => 'nullable|string|max:100|unique:products,sku,' . $product->id,
-            'category_id'       => 'nullable|exists:categories,id',
-            'is_active'         => 'boolean',
-            'is_featured'       => 'boolean',
-            'main_image'        => 'nullable|image|max:4096',
-            'images.*'          => 'nullable|image|max:4096',
+            'price' => 'required|numeric|min:0',
+            'sale_price' => 'nullable|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'sku' => 'nullable|string|max:100|unique:products,sku,'.$product->id,
+            'category_id' => 'nullable|exists:categories,id',
+            'is_active' => 'boolean',
+            'is_featured' => 'boolean',
+            'main_image' => 'nullable|image|max:4096',
+            'images.*' => 'nullable|image|max:4096',
         ]);
 
         $data['slug'] = Str::slug($data['name']);
@@ -127,7 +129,7 @@ class ProductController extends Controller
             if ($product->main_image) {
                 Storage::disk('public')->delete($product->main_image);
             }
-            $data['main_image'] = $request->file('main_image')->store('products', 'public');
+            $data['main_image'] = ProductImageProcessor::store($request->file('main_image'));
         } else {
             unset($data['main_image']); // conserver l'image existante
         }
@@ -142,7 +144,7 @@ class ProductController extends Controller
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $i => $file) {
-                $path = $file->store('products', 'public');
+                $path = ProductImageProcessor::store($file);
                 $product->images()->create(['path' => $path, 'sort_order' => $product->images()->count() + $i]);
             }
         }

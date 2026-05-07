@@ -76,7 +76,7 @@ export default function Settings({ settings }) {
                             style={inputStyle}
                             onFocus={(e) => e.target.style.borderColor = '#C8A96E'}
                             onBlur={(e) => e.target.style.borderColor = '#D4CFC8'}
-                            placeholder="support@halalstore.com"
+                            placeholder="support@soukjannah.com"
                         />
                     </Field>
                 </FormSection>

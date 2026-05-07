@@ -205,10 +205,15 @@ export default function ShopIndex({ products, categories = [], activeCategory = 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    const metaDesc = activeCategory
+        ? `${activeCategory.name} — ${t('meta_shop_default')}`.slice(0, 170)
+        : t('meta_shop_default');
+
     return (
         <PublicLayout>
-            <Head title={activeCategory ? `${activeCategory.name} — ${t('shop_title')}` : t('shop_title')} />
-
+            <Head title={activeCategory ? `${activeCategory.name} — ${t('shop_title')}` : `${t('shop_title')} — SoukJannah`}>
+                <meta head-key="description" name="description" content={metaDesc} />
+            </Head>
             {/* Fil d'Ariane */}
             <div className="border-b" style={{ borderColor: '#E8E2D9', backgroundColor: '#FAF8F4' }}>
                 <div className="max-w-6xl mx-auto px-4 py-2.5">

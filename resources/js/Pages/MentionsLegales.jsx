@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import PublicLayout from '../Layouts/PublicLayout';
 import { useT } from '../contexts/LanguageContext';
 
@@ -16,11 +16,14 @@ function Section({ title, children }) {
 
 export default function MentionsLegales() {
     const { t, lang } = useT();
+    const { supportEmail } = usePage().props;
+    const mail = supportEmail || 'support@soukjannah.com';
 
     return (
         <PublicLayout>
-            <Head title={`${t('legal_title')} — SoukJannah`} />
-
+            <Head title={`${t('legal_title')} — SoukJannah`}>
+                <meta head-key="description" name="description" content={t('meta_legal')} />
+            </Head>
             {/* Fil d'ariane */}
             <div className="border-b" style={{ borderColor: '#E8E2D9', backgroundColor: '#FAF8F4' }}>
                 <div className="max-w-3xl mx-auto px-4 py-3">
@@ -47,7 +50,7 @@ export default function MentionsLegales() {
                     <div className="mt-3 p-4 border" style={{ borderColor: '#E8E2D9', backgroundColor: '#F0EBE1' }}>
                         <p><strong style={{ color: '#1A1A1A' }}>SoukJannah</strong></p>
                         <p>Suisse</p>
-                        <p>Email : <a href="mailto:support@elyesnaitliman.ch" className="underline hover:opacity-70" style={{ color: '#C8A96E' }}>support@elyesnaitliman.ch</a></p>
+                        <p>Email : <a href={`mailto:${mail}`} className="underline hover:opacity-70" style={{ color: '#C8A96E' }}>{mail}</a></p>
                     </div>
                     <p className="mt-3 text-xs italic" style={{ color: '#9A9490' }}>{t('legal_publisher_note')}</p>
                 </Section>
@@ -69,7 +72,7 @@ export default function MentionsLegales() {
                 <Section title={t('legal_data_title')}>
                     <p>{t('legal_data_p1')}</p>
                     <p>{t('legal_data_p2')}</p>
-                    <p>{t('legal_data_p3')} <a href="mailto:support@elyesnaitliman.ch" className="underline hover:opacity-70" style={{ color: '#C8A96E' }}>support@elyesnaitliman.ch</a></p>
+                    <p>{t('legal_data_p3')} <a href={`mailto:${mail}`} className="underline hover:opacity-70" style={{ color: '#C8A96E' }}>{mail}</a></p>
                 </Section>
 
                 <Section title={t('legal_cookies_title')}>
