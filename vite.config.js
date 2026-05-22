@@ -13,6 +13,13 @@ export default defineConfig({
         tailwindcss(),
     ],
     server: {
+        // IPv6 [::1] n'est pas une source CSP valide dans Chrome ; on reste en 127.0.0.1 pour coller à SecurityHeaders.
+        host: '127.0.0.1',
+        port: 5173,
+        strictPort: true,
+        hmr: {
+            host: '127.0.0.1',
+        },
         watch: {
             ignored: ['**/storage/framework/views/**'],
         },

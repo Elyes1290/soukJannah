@@ -31,14 +31,23 @@ class SecurityHeaders
 
         // Content-Security-Policy : autorise les ressources tierces nécessaires
         // (Stripe, Google, Meta Pixel, TikTok Pixel, etc.)
+        // En local : Vite (5173) hors origine Laravel. Pas de [::1] : les navigateurs rejettent cette forme dans la CSP.
+        // Le WebSocket du HMR ne va que dans connect-src (pas script-src / style-src).
+        $viteHttpLocal = '';
+        $viteWsLocal = '';
+        if (app()->environment('local')) {
+            $viteHttpLocal = 'http://127.0.0.1:5173 http://localhost:5173';
+            $viteWsLocal = 'ws://127.0.0.1:5173 ws://localhost:5173';
+        }
+
         $csp = implode('; ', [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://analytics.tiktok.com https://accounts.google.com",
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' {$viteHttpLocal} https://js.stripe.com https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://analytics.tiktok.com https://accounts.google.com",
+            "style-src 'self' 'unsafe-inline' {$viteHttpLocal} https://fonts.googleapis.com",
             "font-src 'self' https://fonts.gstatic.com data:",
             "img-src 'self' data: blob: https: http:",
             "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.googletagmanager.com",
-            "connect-src 'self' https://api.stripe.com https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://analytics.tiktok.com",
+            "connect-src 'self' {$viteHttpLocal} {$viteWsLocal} https://api.stripe.com https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://analytics.tiktok.com",
             "object-src 'none'",
             "base-uri 'self'",
         ]);

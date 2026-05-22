@@ -58,13 +58,46 @@ export default function Home({ featured, categories = [], featuredOffers = [], r
                 <meta name="description" content={t('meta_home')} />
             </Head>
 
-            {/* Hero */}
-            <section className="relative overflow-hidden" style={{ backgroundColor: '#F0EBE1', minHeight: '85vh' }}>
-                <div className="max-w-6xl mx-auto px-4 py-24 md:py-40 flex flex-col justify-center h-full">
+            {/* Hero — bannière desktop + fichier dédié mobile (voir public/images/bannière-mobile.png) */}
+            <section className="relative overflow-hidden md:min-h-[85vh] min-h-[min(76svh,680px)]" style={{ backgroundColor: '#F0EBE1' }}>
+                <div className="absolute inset-0 z-0 w-full">
+                    <picture className="block h-full min-h-[220px] w-full">
+                        <source
+                            media="(max-width: 767px)"
+                            srcSet={encodeURI('/images/bannière-mobile.png')}
+                        />
+                        <img
+                            src={encodeURI('/images/bannière.png')}
+                            alt=""
+                            className="hero-banner-cover"
+                            draggable={false}
+                            loading="eager"
+                            decoding="async"
+                        />
+                    </picture>
+                </div>
+                {/* Voile : vertical sur mobile, diagonal sur desktop */}
+                <div
+                    className="pointer-events-none absolute inset-0 z-[1] md:hidden"
+                    style={{
+                        background:
+                            'linear-gradient(180deg, rgba(240, 235, 225, 0.96) 0%, rgba(240, 235, 225, 0.78) 28%, rgba(240, 235, 225, 0.35) 55%, rgba(240, 235, 225, 0.08) 100%)',
+                    }}
+                    aria-hidden
+                />
+                <div
+                    className="pointer-events-none absolute inset-0 z-[1] hidden md:block"
+                    style={{
+                        background:
+                            'linear-gradient(105deg, rgba(240, 235, 225, 0.94) 0%, rgba(240, 235, 225, 0.55) 42%, rgba(240, 235, 225, 0.12) 68%, transparent 100%)',
+                    }}
+                    aria-hidden
+                />
+                <div className="relative z-[2] max-w-6xl mx-auto px-4 py-16 sm:py-20 md:py-40 flex flex-col justify-center md:min-h-[85vh]">
                     <p className="text-xs tracking-[0.4em] uppercase mb-8 font-light" style={{ color: '#C8A96E' }}>
                         {t('home_hero_tag')}
                     </p>
-                    <h1 className="font-serif font-normal leading-tight mb-8" style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)', color: '#1A1A1A', maxWidth: '700px' }}>
+                    <h1 className="font-serif font-normal leading-tight mb-8 drop-shadow-[0_1px_12px_rgba(250,248,244,0.55)]" style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)', color: '#1A1A1A', maxWidth: '700px' }}>
                         {t('home_hero_h1a')}<br />
                         <em>{t('home_hero_h1b')}</em>
                     </h1>
@@ -79,17 +112,6 @@ export default function Home({ featured, categories = [], featuredOffers = [], r
                             {t('home_hero_gift')}
                         </Link>
                     </div>
-                </div>
-                <div className="absolute right-0 top-0 h-full w-1/3 hidden lg:flex items-center justify-center opacity-10">
-                    <svg viewBox="0 0 200 200" className="w-96 h-96" fill="none">
-                        <circle cx="100" cy="100" r="80" stroke="#C8A96E" strokeWidth="0.5"/>
-                        <circle cx="100" cy="100" r="60" stroke="#C8A96E" strokeWidth="0.5"/>
-                        <circle cx="100" cy="100" r="40" stroke="#C8A96E" strokeWidth="0.5"/>
-                        <line x1="100" y1="20" x2="100" y2="180" stroke="#C8A96E" strokeWidth="0.5"/>
-                        <line x1="20" y1="100" x2="180" y2="100" stroke="#C8A96E" strokeWidth="0.5"/>
-                        <line x1="43" y1="43" x2="157" y2="157" stroke="#C8A96E" strokeWidth="0.5"/>
-                        <line x1="157" y1="43" x2="43" y2="157" stroke="#C8A96E" strokeWidth="0.5"/>
-                    </svg>
                 </div>
             </section>
 

@@ -207,7 +207,7 @@ export default function PublicLayout({ children }) {
                     style={{ borderBottom: "1px solid #E8E2D9" }}
                 >
                     {/* ── Rangée 1 : Logo + Recherche + Actions ── */}
-                    <div className="max-w-6xl mx-auto px-4 py-2 flex items-center gap-4">
+                    <div className="max-w-6xl mx-auto px-4 max-md:pl-3 max-md:pr-1.5 py-2 flex items-center gap-3 max-md:gap-2 justify-between md:justify-start">
                         {/* Logo — overflow-hidden pour rogner le padding transparent du PNG */}
                         <Link href="/" className="flex-shrink-0 block overflow-hidden" style={{ height: '80px' }}>
                             <img
@@ -296,7 +296,7 @@ export default function PublicLayout({ children }) {
                         </div>
 
                         {/* Actions droite */}
-                        <div className="flex items-center gap-3 flex-shrink-0">
+                        <div className="flex items-center gap-2 md:gap-3 flex-shrink-0 max-md:mr-0">
                             {/* Compte */}
                             {authCustomer ? (
                                 <Link
