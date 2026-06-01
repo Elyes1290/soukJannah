@@ -39,6 +39,7 @@ export default function CookieBanner({ onAccept, onDecline }) {
                     {/* Boutons */}
                     <div style={{ display: 'flex', gap: '10px', flexShrink: 0 }}>
                         <button
+                            type="button"
                             onClick={onDecline}
                             style={{
                                 padding: '9px 20px',
@@ -57,6 +58,7 @@ export default function CookieBanner({ onAccept, onDecline }) {
                             {t('cookie_decline')}
                         </button>
                         <button
+                            type="button"
                             onClick={onAccept}
                             style={{
                                 padding: '9px 20px',

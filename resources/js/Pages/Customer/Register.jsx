@@ -70,10 +70,11 @@ export default function CustomerRegister() {
                 <form onSubmit={submit} className="space-y-5">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs tracking-widest uppercase font-medium mb-2" style={{ color: '#1A1A1A' }}>
+                            <label htmlFor="register-first-name" className="block text-xs tracking-widest uppercase font-medium mb-2" style={{ color: '#1A1A1A' }}>
                                 {t('account_firstname')}
                             </label>
                             <input
+                                id="register-first-name"
                                 type="text"
                                 value={data.first_name}
                                 onChange={e => setData('first_name', e.target.value)}
@@ -84,10 +85,11 @@ export default function CustomerRegister() {
                             {errors.first_name && <p className="text-xs mt-1" style={{ color: '#dc2626' }}>{errors.first_name}</p>}
                         </div>
                         <div>
-                            <label className="block text-xs tracking-widest uppercase font-medium mb-2" style={{ color: '#1A1A1A' }}>
+                            <label htmlFor="register-last-name" className="block text-xs tracking-widest uppercase font-medium mb-2" style={{ color: '#1A1A1A' }}>
                                 {t('account_lastname')}
                             </label>
                             <input
+                                id="register-last-name"
                                 type="text"
                                 value={data.last_name}
                                 onChange={e => setData('last_name', e.target.value)}
@@ -99,10 +101,11 @@ export default function CustomerRegister() {
                     </div>
 
                     <div>
-                        <label className="block text-xs tracking-widest uppercase font-medium mb-2" style={{ color: '#1A1A1A' }}>
+                        <label htmlFor="register-email" className="block text-xs tracking-widest uppercase font-medium mb-2" style={{ color: '#1A1A1A' }}>
                             {t('account_email')}
                         </label>
                         <input
+                            id="register-email"
                             type="email"
                             value={data.email}
                             onChange={e => setData('email', e.target.value)}

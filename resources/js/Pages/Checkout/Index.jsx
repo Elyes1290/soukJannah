@@ -45,10 +45,11 @@ export default function CheckoutIndex({ cart }) {
                         ))}
                         {/* Note de commande */}
                         <div className="pt-8">
-                            <p className="text-xs tracking-widest uppercase mb-3 font-medium" style={{ color: '#1A1A1A' }}>
+                            <label htmlFor="checkout-order-note" className="text-xs tracking-widest uppercase mb-3 font-medium block" style={{ color: '#1A1A1A' }}>
                                 {t('checkout_order_note_optional')}
-                            </p>
+                            </label>
                             <textarea
+                                id="checkout-order-note"
                                 value={orderNote}
                                 onChange={e => setOrderNote(e.target.value)}
                                 rows={2}
@@ -75,11 +76,13 @@ export default function CheckoutIndex({ cart }) {
                             </label>
                             {isGift && (
                                 <textarea
+                                    id="checkout-gift-message"
                                     value={giftMessage}
                                     onChange={e => setGiftMessage(e.target.value)}
                                     rows={2}
                                     maxLength={300}
                                     placeholder={t('checkout_gift_message_placeholder')}
+                                    aria-label={t('checkout_gift_message_placeholder')}
                                     className="w-full mt-3 border px-4 py-3 text-sm font-light focus:outline-none focus:ring-1 focus:ring-amber-300 resize-none"
                                     style={{ borderColor: '#C8A96E', backgroundColor: '#FFF8ED', color: '#1A1A1A' }}
                                 />
@@ -108,7 +111,7 @@ export default function CheckoutIndex({ cart }) {
                                     <span className="font-serif text-xl" style={{ color: '#1A1A1A' }}>{cart.total.toFixed(2)} CHF</span>
                                 </div>
                             </div>
-                            <button onClick={handleCheckout} className="w-full py-4 text-xs font-medium uppercase transition-colors" style={{ backgroundColor: '#1A1A1A', color: 'white', letterSpacing: '0.15em' }} onMouseEnter={(e) => e.target.style.backgroundColor = '#C8A96E'} onMouseLeave={(e) => e.target.style.backgroundColor = '#1A1A1A'}>
+                            <button type="button" onClick={handleCheckout} className="w-full py-4 text-xs font-medium uppercase transition-colors" style={{ backgroundColor: '#1A1A1A', color: 'white', letterSpacing: '0.15em' }} onMouseEnter={(e) => e.target.style.backgroundColor = '#C8A96E'} onMouseLeave={(e) => e.target.style.backgroundColor = '#1A1A1A'}>
                                 {t('checkout_pay')}
                             </button>
                             <div className="mt-5 flex items-center justify-center gap-2">

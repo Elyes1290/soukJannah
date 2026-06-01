@@ -5,11 +5,13 @@ import { useT } from '../../contexts/LanguageContext';
 import { docTitle } from '../../i18n/docTitle';
 
 function StarPicker({ value, onChange }) {
+    const { t } = useT();
     const [hovered, setHovered] = useState(0);
     return (
         <div className="flex gap-1">
             {[1, 2, 3, 4, 5].map(n => (
                 <button key={n} type="button"
+                    aria-label={t('review_star_n', { n })}
                     className="text-2xl transition-transform hover:scale-110"
                     style={{ color: (hovered || value) >= n ? '#C8A96E' : '#D4CDBF' }}
                     onMouseEnter={() => setHovered(n)}
@@ -64,6 +66,7 @@ export default function CustomerReviews({ reviews, reviewableProducts }) {
                 <div className="mb-8">
                     {!showForm ? (
                         <button
+                            type="button"
                             onClick={() => setShowForm(true)}
                             className="flex items-center gap-2 px-6 py-3 border text-sm font-medium transition-colors hover:border-amber-600"
                             style={{ borderColor: '#C8A96E', color: '#C8A96E', borderStyle: 'dashed' }}
@@ -78,8 +81,8 @@ export default function CustomerReviews({ reviews, reviewableProducts }) {
                             <p className="text-xs tracking-widest uppercase font-medium mb-5" style={{ color: '#1A1A1A' }}>{t('review_write')}</p>
                             <form onSubmit={submit} className="space-y-4">
                                 <div>
-                                    <label className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('review_for_product')}</label>
-                                    <select value={form.data.product_id} onChange={handleProductChange}
+                                    <label htmlFor="review-product" className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('review_for_product')}</label>
+                                    <select id="review-product" value={form.data.product_id} onChange={handleProductChange}
                                         className="w-full px-3 py-2.5 border text-sm outline-none focus:border-amber-600"
                                         style={{ borderColor: form.errors.product_id ? '#dc2626' : '#D4CDBF', backgroundColor: '#FAF8F4' }} required>
                                         <option value="">{t('review_select_product')}</option>
@@ -96,8 +99,8 @@ export default function CustomerReviews({ reviews, reviewableProducts }) {
                                     <StarPicker value={form.data.rating} onChange={v => form.setData('rating', v)} />
                                 </div>
                                 <div>
-                                    <label className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('review_comment')}</label>
-                                    <textarea value={form.data.content} onChange={e => form.setData('content', e.target.value)}
+                                    <label htmlFor="review-content" className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('review_comment')}</label>
+                                    <textarea id="review-content" value={form.data.content} onChange={e => form.setData('content', e.target.value)}
                                         rows={4}
                                         className="w-full px-3 py-2.5 border text-sm outline-none focus:border-amber-600 resize-none"
                                         style={{ borderColor: form.errors.content ? '#dc2626' : '#D4CDBF', backgroundColor: '#FAF8F4' }}

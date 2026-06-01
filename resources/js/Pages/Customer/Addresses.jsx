@@ -30,8 +30,8 @@ function AddressForm({ initial = emptyForm, onSubmit, processing, errors, submit
         <form onSubmit={handle} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('addr_label')}</label>
-                    <input type="text" value={form.data.label} onChange={e => form.setData('label', e.target.value)}
+                    <label htmlFor="addr-label" className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('addr_label')}</label>
+                    <input id="addr-label" type="text" value={form.data.label} onChange={e => form.setData('label', e.target.value)}
                         className="w-full px-3 py-2.5 border text-sm outline-none focus:border-amber-600"
                         style={{ borderColor: '#D4CDBF', backgroundColor: '#FAF8F4' }}
                         placeholder={t('addr_label_placeholder')} />
@@ -46,51 +46,51 @@ function AddressForm({ initial = emptyForm, onSubmit, processing, errors, submit
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('account_first_name')} *</label>
-                    <input type="text" value={form.data.first_name} onChange={e => form.setData('first_name', e.target.value)}
+                    <label htmlFor="addr-first-name" className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('account_first_name')} *</label>
+                    <input id="addr-first-name" type="text" value={form.data.first_name} onChange={e => form.setData('first_name', e.target.value)}
                         className="w-full px-3 py-2.5 border text-sm outline-none focus:border-amber-600"
                         style={{ borderColor: errors?.first_name ? '#dc2626' : '#D4CDBF', backgroundColor: '#FAF8F4' }} required />
                     {errors?.first_name && <p className="mt-1 text-xs text-red-600">{errors.first_name}</p>}
                 </div>
                 <div>
-                    <label className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('account_last_name')} *</label>
-                    <input type="text" value={form.data.last_name} onChange={e => form.setData('last_name', e.target.value)}
+                    <label htmlFor="addr-last-name" className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('account_last_name')} *</label>
+                    <input id="addr-last-name" type="text" value={form.data.last_name} onChange={e => form.setData('last_name', e.target.value)}
                         className="w-full px-3 py-2.5 border text-sm outline-none focus:border-amber-600"
                         style={{ borderColor: errors?.last_name ? '#dc2626' : '#D4CDBF', backgroundColor: '#FAF8F4' }} required />
                     {errors?.last_name && <p className="mt-1 text-xs text-red-600">{errors.last_name}</p>}
                 </div>
             </div>
             <div>
-                <label className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('addr_address')} *</label>
-                <input type="text" value={form.data.address} onChange={e => form.setData('address', e.target.value)}
+                <label htmlFor="addr-street" className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('addr_address')} *</label>
+                <input id="addr-street" type="text" value={form.data.address} onChange={e => form.setData('address', e.target.value)}
                     className="w-full px-3 py-2.5 border text-sm outline-none focus:border-amber-600"
                     style={{ borderColor: errors?.address ? '#dc2626' : '#D4CDBF', backgroundColor: '#FAF8F4' }}
                     placeholder={t('addr_street_placeholder')} required />
                 {errors?.address && <p className="mt-1 text-xs text-red-600">{errors.address}</p>}
             </div>
             <div>
-                <label className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('addr_address2')}</label>
-                <input type="text" value={form.data.address2} onChange={e => form.setData('address2', e.target.value)}
+                <label htmlFor="addr-street2" className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('addr_address2')}</label>
+                <input id="addr-street2" type="text" value={form.data.address2} onChange={e => form.setData('address2', e.target.value)}
                     className="w-full px-3 py-2.5 border text-sm outline-none focus:border-amber-600"
                     style={{ borderColor: '#D4CDBF', backgroundColor: '#FAF8F4' }}
                     placeholder={t('addr_address2_placeholder')} />
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 <div>
-                    <label className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('addr_postal')} *</label>
-                    <input type="text" value={form.data.postal_code} onChange={e => form.setData('postal_code', e.target.value)}
+                    <label htmlFor="addr-postal" className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('addr_postal')} *</label>
+                    <input id="addr-postal" type="text" value={form.data.postal_code} onChange={e => form.setData('postal_code', e.target.value)}
                         className="w-full px-3 py-2.5 border text-sm outline-none focus:border-amber-600"
                         style={{ borderColor: errors?.postal_code ? '#dc2626' : '#D4CDBF', backgroundColor: '#FAF8F4' }} required />
                 </div>
                 <div>
-                    <label className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('addr_city')} *</label>
-                    <input type="text" value={form.data.city} onChange={e => form.setData('city', e.target.value)}
+                    <label htmlFor="addr-city" className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('addr_city')} *</label>
+                    <input id="addr-city" type="text" value={form.data.city} onChange={e => form.setData('city', e.target.value)}
                         className="w-full px-3 py-2.5 border text-sm outline-none focus:border-amber-600"
                         style={{ borderColor: errors?.city ? '#dc2626' : '#D4CDBF', backgroundColor: '#FAF8F4' }} required />
                 </div>
                 <div className="col-span-2 sm:col-span-1">
-                    <label className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('addr_country')} *</label>
-                    <select value={form.data.country} onChange={e => form.setData('country', e.target.value)}
+                    <label htmlFor="addr-country" className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('addr_country')} *</label>
+                    <select id="addr-country" value={form.data.country} onChange={e => form.setData('country', e.target.value)}
                         className="w-full px-3 py-2.5 border text-sm outline-none focus:border-amber-600"
                         style={{ borderColor: '#D4CDBF', backgroundColor: '#FAF8F4' }}>
                         {COUNTRY_CODES.map(code => <option key={code} value={code}>{t(`country_${code}`)}</option>)}
@@ -98,8 +98,8 @@ function AddressForm({ initial = emptyForm, onSubmit, processing, errors, submit
                 </div>
             </div>
             <div>
-                <label className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('account_phone')}</label>
-                <input type="tel" value={form.data.phone} onChange={e => form.setData('phone', e.target.value)}
+                <label htmlFor="addr-phone" className="block text-xs tracking-wider uppercase font-medium mb-1.5" style={{ color: '#6B6560' }}>{t('account_phone')}</label>
+                <input id="addr-phone" type="tel" value={form.data.phone} onChange={e => form.setData('phone', e.target.value)}
                     className="w-full px-3 py-2.5 border text-sm outline-none focus:border-amber-600"
                     style={{ borderColor: '#D4CDBF', backgroundColor: '#FAF8F4' }}
                     placeholder={t('account_phone_placeholder')} />
@@ -182,11 +182,11 @@ export default function CustomerAddresses({ addresses }) {
                                         {addr.phone && <p className="text-sm font-light mt-1" style={{ color: '#9A9490' }}>{addr.phone}</p>}
                                     </div>
                                     <div className="flex flex-col gap-2 items-end">
-                                        <button onClick={() => setEditingId(addr.id)} className="text-xs underline transition-opacity hover:opacity-60" style={{ color: '#C8A96E', textUnderlineOffset: '3px' }}>{t('addr_edit')}</button>
+                                        <button type="button" onClick={() => setEditingId(addr.id)} className="text-xs underline transition-opacity hover:opacity-60" style={{ color: '#C8A96E', textUnderlineOffset: '3px' }}>{t('addr_edit')}</button>
                                         {!addr.is_default && (
                                             <>
-                                                <button onClick={() => handleSetDefault(addr.id)} className="text-xs underline transition-opacity hover:opacity-60" style={{ color: '#6B6560', textUnderlineOffset: '3px' }}>{t('addr_make_default')}</button>
-                                                <button onClick={() => handleDelete(addr.id)} className="text-xs underline transition-opacity hover:opacity-60" style={{ color: '#dc2626', textUnderlineOffset: '3px' }}>{t('addr_delete')}</button>
+                                                <button type="button" onClick={() => handleSetDefault(addr.id)} className="text-xs underline transition-opacity hover:opacity-60" style={{ color: '#6B6560', textUnderlineOffset: '3px' }}>{t('addr_make_default')}</button>
+                                                <button type="button" onClick={() => handleDelete(addr.id)} className="text-xs underline transition-opacity hover:opacity-60" style={{ color: '#dc2626', textUnderlineOffset: '3px' }}>{t('addr_delete')}</button>
                                             </>
                                         )}
                                     </div>
@@ -200,6 +200,7 @@ export default function CustomerAddresses({ addresses }) {
             {/* Ajouter une adresse */}
             {!showAdd ? (
                 <button
+                    type="button"
                     onClick={() => setShowAdd(true)}
                     className="flex items-center gap-2 px-6 py-3 border text-sm font-medium transition-colors hover:border-amber-600"
                     style={{ borderColor: '#D4CDBF', color: '#1A1A1A', borderStyle: 'dashed' }}

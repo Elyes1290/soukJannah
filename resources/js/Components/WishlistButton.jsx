@@ -13,7 +13,7 @@ export default function WishlistButton({ productId, size = 'md', className = '' 
     const iconSize = size === 'sm' ? 'w-4 h-4' : size === 'lg' ? 'w-6 h-6' : 'w-5 h-5';
     const btnSize  = size === 'sm' ? 'p-1.5' : size === 'lg' ? 'p-3' : 'p-2';
 
-    const handleClick = async (e) => {
+    const toggleWishlist = async (e) => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -49,7 +49,9 @@ export default function WishlistButton({ productId, size = 'md', className = '' 
 
     return (
         <button
-            onClick={handleClick}
+            type="button"
+            onClick={toggleWishlist}
+            aria-label={inWishlist ? t('wishlist_a11y_remove') : t('wishlist_a11y_add')}
             title={inWishlist ? t('wishlist_a11y_remove') : t('wishlist_a11y_add')}
             className={`${btnSize} rounded-full transition-all ${loading ? 'opacity-50' : 'hover:scale-110'} ${className}`}
             style={{ backgroundColor: 'rgba(255,255,255,0.9)' }}

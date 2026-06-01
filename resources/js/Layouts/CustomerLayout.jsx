@@ -148,6 +148,7 @@ export default function CustomerLayout({ children, title }) {
                         {/* Déconnexion */}
                         <div className="mt-6 pt-6 border-t" style={{ borderColor: '#E8E2D9' }}>
                             <button
+                                type="button"
                                 onClick={handleLogout}
                                 className="flex items-center gap-3 px-3 py-2 text-sm font-medium w-full text-left transition-opacity hover:opacity-60"
                                 style={{ color: '#9A9490' }}

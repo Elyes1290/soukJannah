@@ -29,12 +29,12 @@ function CartItem({ item }) {
                 <p className="text-xs font-light mt-1" style={{ color: '#9A9490' }}>{item.price.toFixed(2)} CHF {t('cart_unit')}</p>
             </div>
             <div className="flex items-center border" style={{ borderColor: '#D4CFC8' }}>
-                <button onClick={() => updateQty(item.quantity - 1)} className="px-3 py-2 text-xs hover:opacity-50 transition-opacity" style={{ color: '#1A1A1A' }}>—</button>
+                <button type="button" onClick={() => updateQty(item.quantity - 1)} aria-label={t('cart_qty_decrease')} className="px-3 py-2 text-xs hover:opacity-50 transition-opacity" style={{ color: '#1A1A1A' }}>—</button>
                 <span className="px-4 py-2 text-xs font-medium border-x" style={{ borderColor: '#D4CFC8', minWidth: '2.5rem', textAlign: 'center', color: '#1A1A1A' }}>{item.quantity}</span>
-                <button onClick={() => updateQty(item.quantity + 1)} disabled={item.quantity >= item.stock} className="px-3 py-2 text-xs hover:opacity-50 transition-opacity disabled:opacity-20" style={{ color: '#1A1A1A' }}>+</button>
+                <button type="button" onClick={() => updateQty(item.quantity + 1)} disabled={item.quantity >= item.stock} aria-label={t('cart_qty_increase')} className="px-3 py-2 text-xs hover:opacity-50 transition-opacity disabled:opacity-20" style={{ color: '#1A1A1A' }}>+</button>
             </div>
             <div className="text-sm font-medium w-24 text-right" style={{ color: '#1A1A1A' }}>{(item.price * item.quantity).toFixed(2)} CHF</div>
-            <button onClick={remove} className="text-lg font-light hover:opacity-40 transition-opacity ml-2" style={{ color: '#9A9490' }}>×</button>
+            <button type="button" onClick={remove} aria-label={t('cart_remove_item')} className="text-lg font-light hover:opacity-40 transition-opacity ml-2" style={{ color: '#9A9490' }}>×</button>
         </div>
     );
 }
@@ -68,22 +68,24 @@ function PromoField({ discountCode }) {
                             {discountCode.type === 'percent' ? `-${discountCode.value}%` : `-${parseFloat(discountCode.value).toFixed(2)} CHF`}
                         </p>
                     </div>
-                    <button onClick={remove} className="text-xs font-light hover:opacity-60 transition-opacity" style={{ color: '#E07070' }}>
+                    <button type="button" onClick={remove} className="text-xs font-light hover:opacity-60 transition-opacity" style={{ color: '#E07070' }}>
                         {t('cart_promo_remove')}
                     </button>
                 </div>
             ) : (
                 <>
-                    <button onClick={() => setOpen(!open)} className="text-xs font-light hover:opacity-60 transition-opacity underline" style={{ color: '#9A9490' }}>
+                    <button type="button" onClick={() => setOpen(!open)} className="text-xs font-light hover:opacity-60 transition-opacity underline" style={{ color: '#9A9490' }}>
                         {open ? t('cart_promo_hide') : t('cart_promo_question')}
                     </button>
                     {open && (
                         <form onSubmit={apply} className="mt-2 flex gap-2">
                             <input
                                 type="text"
+                                id="cart-promo-code"
                                 value={data.code}
                                 onChange={e => setData('code', e.target.value.toUpperCase())}
                                 placeholder={t('cart_promo_placeholder')}
+                                aria-label={t('cart_promo_input')}
                                 className="flex-1 px-3 py-2 text-xs font-medium border outline-none"
                                 style={{ borderColor: flash?.discount_error ? '#E07070' : '#D4CFC8', color: '#1A1A1A', letterSpacing: '0.1em' }}
                                 onFocus={e => e.target.style.borderColor = '#C8A96E'}
@@ -141,7 +143,7 @@ export default function CartIndex({ cart }) {
                             <CartItem key={item.product_id} item={item} />
                         ))}
                         <div className="mt-6">
-                            <button onClick={() => router.delete('/panier')} className="text-xs font-light hover:opacity-50 transition-opacity" style={{ color: '#9A9490' }}>
+                            <button type="button" onClick={() => router.delete('/panier')} className="text-xs font-light hover:opacity-50 transition-opacity" style={{ color: '#9A9490' }}>
                                 {t('cart_clear')}
                             </button>
                         </div>

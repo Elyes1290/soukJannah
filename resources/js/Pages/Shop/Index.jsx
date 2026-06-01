@@ -99,7 +99,7 @@ function ProductCard({ product }) {
                 )}
                 {product.stock > 0 && (
                     <div className="absolute bottom-0 left-0 right-0 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-300">
-                        <button onClick={addToCart} className="w-full py-3 text-xs font-medium tracking-widest uppercase transition-colors flex items-center justify-center gap-2" style={{ backgroundColor: added ? '#C8A96E' : '#1A1A1A', color: 'white' }}>
+                        <button type="button" onClick={addToCart} className="w-full py-3 text-xs font-medium tracking-widest uppercase transition-colors flex items-center justify-center gap-2" style={{ backgroundColor: added ? '#C8A96E' : '#1A1A1A', color: 'white' }}>
                             {added ? (
                                 <><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>{t('shop_added')}</>
                             ) : (
@@ -164,15 +164,15 @@ function Pagination({ pagination, onPageChange }) {
                 {from}–{to} {t('shop_of')} {total} {total > 1 ? t('shop_products_count_plural') : t('shop_products_count')}
             </p>
             <div className="flex items-center gap-1.5">
-                <button onClick={() => onPageChange(current_page - 1)} disabled={current_page === 1} className="px-3 py-2 text-xs border transition-colors disabled:opacity-30" style={{ borderColor: '#E8E2D9', color: '#6B6560', backgroundColor: 'white' }}>←</button>
+                <button type="button" onClick={() => onPageChange(current_page - 1)} disabled={current_page === 1} aria-label={t('shop_pagination_prev')} className="px-3 py-2 text-xs border transition-colors disabled:opacity-30" style={{ borderColor: '#E8E2D9', color: '#6B6560', backgroundColor: 'white' }}>←</button>
                 {pages.map((page, i) =>
                     page === '…' ? (
                         <span key={`ellipsis-${i}`} className="px-2 text-xs" style={{ color: '#9A9490' }}>…</span>
                     ) : (
-                        <button key={page} onClick={() => onPageChange(page)} className="w-9 h-9 text-xs border transition-colors" style={page === current_page ? { borderColor: '#1A1A1A', backgroundColor: '#1A1A1A', color: 'white' } : { borderColor: '#E8E2D9', color: '#6B6560', backgroundColor: 'white' }}>{page}</button>
+                        <button key={page} type="button" onClick={() => onPageChange(page)} aria-label={t('shop_pagination_page', { n: page })} aria-current={page === current_page ? 'page' : undefined} className="w-9 h-9 text-xs border transition-colors" style={page === current_page ? { borderColor: '#1A1A1A', backgroundColor: '#1A1A1A', color: 'white' } : { borderColor: '#E8E2D9', color: '#6B6560', backgroundColor: 'white' }}>{page}</button>
                     )
                 )}
-                <button onClick={() => onPageChange(current_page + 1)} disabled={current_page === last_page} className="px-3 py-2 text-xs border transition-colors disabled:opacity-30" style={{ borderColor: '#E8E2D9', color: '#6B6560', backgroundColor: 'white' }}>→</button>
+                <button type="button" onClick={() => onPageChange(current_page + 1)} disabled={current_page === last_page} aria-label={t('shop_pagination_next')} className="px-3 py-2 text-xs border transition-colors disabled:opacity-30" style={{ borderColor: '#E8E2D9', color: '#6B6560', backgroundColor: 'white' }}>→</button>
             </div>
         </div>
     );
@@ -296,7 +296,7 @@ export default function ShopIndex({ products, categories = [], activeCategory = 
                         <span style={{ color: '#C8A96E' }}>›</span>
                         {activeCategory ? (
                             <>
-                                <button onClick={() => filterByCategory(null)} className="hover:opacity-60 transition-opacity" style={{ color: '#9A9490' }}>{t('shop_title')}</button>
+                                <button type="button" onClick={() => filterByCategory(null)} className="hover:opacity-60 transition-opacity" style={{ color: '#9A9490' }}>{t('shop_title')}</button>
                                 <span style={{ color: '#C8A96E' }}>›</span>
                                 <span style={{ color: '#1A1A1A', fontWeight: '500' }}>{activeCategory.name}</span>
                             </>
@@ -324,13 +324,13 @@ export default function ShopIndex({ products, categories = [], activeCategory = 
                                 <div className="h-5 w-px flex-shrink-0 mx-1" style={{ backgroundColor: '#E8E2D9' }} />
                                 <div className="flex items-center gap-2 overflow-x-auto min-w-0 flex-1 pb-0.5">
                                     {activeCategory && (
-                                        <button onClick={() => filterByCategory(null)} className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border whitespace-nowrap transition-colors" style={{ borderColor: '#D4CFC8', color: '#9A9490', backgroundColor: 'white' }}>
+                                        <button type="button" onClick={() => filterByCategory(null)} className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border whitespace-nowrap transition-colors" style={{ borderColor: '#D4CFC8', color: '#9A9490', backgroundColor: 'white' }}>
                                             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
                                             {t('shop_all')}
                                         </button>
                                     )}
                                     {categories.map((cat) => (
-                                        <button key={cat.id} onClick={() => filterByCategory(cat.slug)} className="flex-shrink-0 px-4 py-1.5 text-xs font-medium transition-all whitespace-nowrap border" style={activeCategory?.slug === cat.slug ? { backgroundColor: '#1A1A1A', color: 'white', borderColor: '#1A1A1A' } : { backgroundColor: 'white', color: '#6B6560', borderColor: '#E8E2D9' }} onMouseEnter={(e) => { if (activeCategory?.slug !== cat.slug) { e.currentTarget.style.borderColor = '#C8A96E'; e.currentTarget.style.color = '#C8A96E'; }}} onMouseLeave={(e) => { if (activeCategory?.slug !== cat.slug) { e.currentTarget.style.borderColor = '#E8E2D9'; e.currentTarget.style.color = '#6B6560'; }}}>
+                                        <button key={cat.id} type="button" onClick={() => filterByCategory(cat.slug)} className="flex-shrink-0 px-4 py-1.5 text-xs font-medium transition-all whitespace-nowrap border" style={activeCategory?.slug === cat.slug ? { backgroundColor: '#1A1A1A', color: 'white', borderColor: '#1A1A1A' } : { backgroundColor: 'white', color: '#6B6560', borderColor: '#E8E2D9' }} onMouseEnter={(e) => { if (activeCategory?.slug !== cat.slug) { e.currentTarget.style.borderColor = '#C8A96E'; e.currentTarget.style.color = '#C8A96E'; }}} onMouseLeave={(e) => { if (activeCategory?.slug !== cat.slug) { e.currentTarget.style.borderColor = '#E8E2D9'; e.currentTarget.style.color = '#6B6560'; }}}>
                                             {cat.name}
                                         </button>
                                     ))}
@@ -349,7 +349,7 @@ export default function ShopIndex({ products, categories = [], activeCategory = 
                         <p className="text-xs tracking-[0.4em] uppercase mb-6 font-light" style={{ color: '#C8A96E' }}>{t('shop_browse_tag')}</p>
                         <div className="flex flex-wrap gap-3">
                             {categories.map((cat) => (
-                                <button key={cat.id} onClick={() => filterByCategory(cat.slug)} className="group flex items-center gap-3 px-5 py-3 border bg-white transition-all hover:shadow-sm" style={{ borderColor: '#E8E2D9' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#C8A96E'; e.currentTarget.style.backgroundColor = '#F0EBE1'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E8E2D9'; e.currentTarget.style.backgroundColor = 'white'; }}>
+                                <button key={cat.id} type="button" onClick={() => filterByCategory(cat.slug)} className="group flex items-center gap-3 px-5 py-3 border bg-white transition-all hover:shadow-sm" style={{ borderColor: '#E8E2D9' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#C8A96E'; e.currentTarget.style.backgroundColor = '#F0EBE1'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E8E2D9'; e.currentTarget.style.backgroundColor = 'white'; }}>
                                     <span className="font-serif text-sm" style={{ color: '#1A1A1A' }}>{cat.name}</span>
                                     <svg className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" style={{ color: '#C8A96E' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
                                 </button>
@@ -370,7 +370,7 @@ export default function ShopIndex({ products, categories = [], activeCategory = 
                         {activeSearch && <span style={{ color: '#C8A96E' }}> · {t('shop_search_label')} "{activeSearch}"</span>}
                     </p>
                     {activeSearch && (
-                        <button onClick={clearSearch} className="flex items-center gap-1.5 text-xs font-light hover:opacity-70 transition-opacity" style={{ color: '#9A9490' }}>
+                        <button type="button" onClick={clearSearch} className="flex items-center gap-1.5 text-xs font-light hover:opacity-70 transition-opacity" style={{ color: '#9A9490' }}>
                             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                             {t('shop_clear_search')}
                         </button>
@@ -385,7 +385,7 @@ export default function ShopIndex({ products, categories = [], activeCategory = 
                             {activeSearch ? `${t('shop_no_results')} "${activeSearch}".` : activeCategory ? `${t('shop_no_in_category')} "${activeCategory.name}"${t('shop_no_category_suffix')}` : t('shop_being_prepared')}
                         </p>
                         {activeCategory && (
-                            <button onClick={() => filterByCategory(null)} className="text-xs font-medium underline" style={{ color: '#C8A96E' }}>
+                            <button type="button" onClick={() => filterByCategory(null)} className="text-xs font-medium underline" style={{ color: '#C8A96E' }}>
                                 {t('shop_view_all')}
                             </button>
                         )}

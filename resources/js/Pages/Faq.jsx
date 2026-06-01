@@ -8,7 +8,7 @@ function FaqItem({ question, answer }) {
     const [open, setOpen] = useState(false);
     return (
         <div className="border-b" style={{ borderColor: '#E8E2D9' }}>
-            <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between py-4 text-left gap-4">
+            <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="w-full flex items-center justify-between py-4 text-left gap-4">
                 <span className="text-sm font-medium" style={{ color: '#1A1A1A' }}>{question}</span>
                 <svg className="w-4 h-4 flex-shrink-0 transition-transform" style={{ transform: open ? 'rotate(45deg)' : 'none', color: '#C8A96E' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />

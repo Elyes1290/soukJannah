@@ -46,6 +46,7 @@ function NewsletterForm() {
                             value={data.email}
                             onChange={e => setData('email', e.target.value)}
                             placeholder={t('newsletter_placeholder')}
+                            aria-label={t('newsletter_placeholder')}
                             required
                             className="flex-1 px-4 py-3 text-sm font-light outline-none"
                             style={{ backgroundColor: '#2C2C2C', color: '#FAF8F4', border: '1px solid #3C3C3C', borderRight: 'none' }}
@@ -143,7 +144,9 @@ export default function PublicLayout({ children }) {
     const LangSwitcher = ({ mobile = false }) => (
         <div className={`flex items-center gap-1 ${mobile ? "" : ""}`}>
             <button
+                type="button"
                 onClick={() => switchLang("en")}
+                aria-label={t("a11y_lang_en")}
                 className="text-xs font-medium tracking-wider uppercase transition-opacity"
                 style={{
                     color:
@@ -164,7 +167,9 @@ export default function PublicLayout({ children }) {
                 |
             </span>
             <button
+                type="button"
                 onClick={() => switchLang("fr")}
+                aria-label={t("a11y_lang_fr")}
                 className="text-xs font-medium tracking-wider uppercase transition-opacity"
                 style={{
                     color:
@@ -236,6 +241,7 @@ export default function PublicLayout({ children }) {
                                     onFocus={() => { clearTimeout(searchBlurTimeout.current); setSearchFocused(true); }}
                                     onBlur={() => { searchBlurTimeout.current = setTimeout(() => setSearchFocused(false), 200); }}
                                     placeholder={t("nav_search_placeholder") || "Rechercher un produit halal…"}
+                                    aria-label={t("nav_search_placeholder")}
                                     className="flex-1 px-5 py-2.5 text-sm font-light outline-none bg-transparent"
                                     style={{ color: "#1A1A1A" }}
                                 />
@@ -281,7 +287,7 @@ export default function PublicLayout({ children }) {
                                             </p>
                                             <div className="grid grid-cols-2 gap-y-2 gap-x-4">
                                                 {popularSearches.map(term => (
-                                                    <button key={term}
+                                                    <button key={term} type="button"
                                                         onMouseDown={() => { setSearchQuery(term); setTimeout(() => { window.location.href = `/boutique?q=${encodeURIComponent(term)}`; }, 50); }}
                                                         className="flex items-center gap-2 text-sm font-light text-left hover:opacity-70 transition-opacity"
                                                         style={{ color: "#1A1A1A" }}>
@@ -360,6 +366,7 @@ export default function PublicLayout({ children }) {
 
                             {/* Recherche mobile */}
                             <button
+                                type="button"
                                 onClick={openSearch}
                                 className="md:hidden transition-opacity hover:opacity-60"
                                 aria-label={t("nav_search_btn")}
@@ -411,6 +418,7 @@ export default function PublicLayout({ children }) {
 
                             {/* Hamburger mobile */}
                             <button
+                                type="button"
                                 onClick={() => setMobileOpen(true)}
                                 className="md:hidden flex flex-col justify-center gap-1.5 w-8 h-8"
                                 aria-label={t("nav_open_menu")}
@@ -452,7 +460,10 @@ export default function PublicLayout({ children }) {
                                     onMouseLeave={closeDropdown}
                                 >
                                     <button
+                                        type="button"
                                         className="flex items-center gap-1 text-xs tracking-widest uppercase font-medium transition-opacity hover:opacity-60"
+                                        aria-haspopup="true"
+                                        aria-expanded={dropdownOpen}
                                         style={{ color: "#6B6560" }}
                                     >
                                         {t("nav_categories")}
@@ -490,6 +501,7 @@ export default function PublicLayout({ children }) {
                                                 {navCategories.map((cat) => (
                                                     <button
                                                         key={cat.id}
+                                                        type="button"
                                                         onMouseEnter={() => setHoveredCatId(cat.id)}
                                                         onClick={() => { window.location.href = `/boutique?categorie=${cat.slug}`; }}
                                                         className="w-full flex items-center justify-between px-4 py-3 text-left text-sm transition-colors border-b"
@@ -630,6 +642,7 @@ export default function PublicLayout({ children }) {
                                         setSearchQuery(e.target.value)
                                     }
                                     placeholder={t("nav_search_placeholder")}
+                                    aria-label={t("nav_search_placeholder")}
                                     className="flex-1 text-base font-light outline-none bg-transparent"
                                     style={{ color: "#1A1A1A" }}
                                 />
@@ -704,6 +717,7 @@ export default function PublicLayout({ children }) {
                                     </span>
                                 </div>
                                 <button
+                                    type="button"
                                     onClick={closeMobile}
                                     aria-label={t("nav_close")}
                                     className="opacity-60 hover:opacity-100 transition-opacity"
@@ -755,11 +769,13 @@ export default function PublicLayout({ children }) {
                                 {navCategories.length > 0 && (
                                     <>
                                         <button
+                                            type="button"
                                             onClick={() =>
                                                 setMobileCatsOpen(
                                                     !mobileCatsOpen,
                                                 )
                                             }
+                                            aria-expanded={mobileCatsOpen}
                                             className="w-full flex items-center justify-between px-6 py-4 border-b text-sm font-medium tracking-widest uppercase transition-opacity hover:opacity-70"
                                             style={{
                                                 borderColor: "#2C2C2C",
@@ -961,6 +977,7 @@ export default function PublicLayout({ children }) {
                                         placeholder={t(
                                             "nav_search_mobile_placeholder",
                                         )}
+                                        aria-label={t("nav_search_mobile_placeholder")}
                                         className="flex-1 bg-transparent text-sm font-light outline-none"
                                         style={{ color: "#FAF8F4" }}
                                     />

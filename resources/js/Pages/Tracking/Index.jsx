@@ -95,10 +95,11 @@ export default function TrackingIndex({ order, error, prefillNumber = '', tracki
 
                     <form onSubmit={submit} className="space-y-4">
                         <div>
-                            <label className="block text-xs tracking-widest uppercase font-medium mb-2" style={{ color: '#1A1A1A' }}>
+                            <label htmlFor="tracking-order-number" className="block text-xs tracking-widest uppercase font-medium mb-2" style={{ color: '#1A1A1A' }}>
                                 {t('tracking_order_number')}
                             </label>
                             <input
+                                id="tracking-order-number"
                                 type="text"
                                 value={data.number}
                                 onChange={e => setData('number', e.target.value.toUpperCase())}
@@ -113,10 +114,11 @@ export default function TrackingIndex({ order, error, prefillNumber = '', tracki
                         </div>
 
                         <div>
-                            <label className="block text-xs tracking-widest uppercase font-medium mb-2" style={{ color: '#1A1A1A' }}>
+                            <label htmlFor="tracking-order-email" className="block text-xs tracking-widest uppercase font-medium mb-2" style={{ color: '#1A1A1A' }}>
                                 {t('tracking_order_email')}
                             </label>
                             <input
+                                id="tracking-order-email"
                                 type="email"
                                 value={data.email}
                                 onChange={e => setData('email', e.target.value)}

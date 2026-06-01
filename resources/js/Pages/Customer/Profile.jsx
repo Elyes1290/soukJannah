@@ -44,8 +44,9 @@ export default function CustomerProfile({ customer }) {
                     <form onSubmit={submitProfile} className="space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-xs tracking-wider uppercase font-medium mb-2" style={{ color: '#6B6560' }}>{t('account_first_name')}</label>
+                                <label htmlFor="profile-first-name" className="block text-xs tracking-wider uppercase font-medium mb-2" style={{ color: '#6B6560' }}>{t('account_first_name')}</label>
                                 <input
+                                    id="profile-first-name"
                                     type="text"
                                     value={profileForm.data.first_name}
                                     onChange={e => profileForm.setData('first_name', e.target.value)}
@@ -57,8 +58,9 @@ export default function CustomerProfile({ customer }) {
                                 {profileForm.errors.first_name && <p className="mt-1 text-xs text-red-600">{profileForm.errors.first_name}</p>}
                             </div>
                             <div>
-                                <label className="block text-xs tracking-wider uppercase font-medium mb-2" style={{ color: '#6B6560' }}>{t('account_last_name')}</label>
+                                <label htmlFor="profile-last-name" className="block text-xs tracking-wider uppercase font-medium mb-2" style={{ color: '#6B6560' }}>{t('account_last_name')}</label>
                                 <input
+                                    id="profile-last-name"
                                     type="text"
                                     value={profileForm.data.last_name}
                                     onChange={e => profileForm.setData('last_name', e.target.value)}
@@ -72,8 +74,9 @@ export default function CustomerProfile({ customer }) {
                         </div>
 
                         <div>
-                            <label className="block text-xs tracking-wider uppercase font-medium mb-2" style={{ color: '#6B6560' }}>{t('account_email')}</label>
+                            <label htmlFor="profile-email" className="block text-xs tracking-wider uppercase font-medium mb-2" style={{ color: '#6B6560' }}>{t('account_email')}</label>
                             <input
+                                id="profile-email"
                                 type="email"
                                 value={customer.email}
                                 className="w-full px-4 py-3 border text-sm font-light"
@@ -84,8 +87,9 @@ export default function CustomerProfile({ customer }) {
                         </div>
 
                         <div>
-                            <label className="block text-xs tracking-wider uppercase font-medium mb-2" style={{ color: '#6B6560' }}>{t('account_phone')}</label>
+                            <label htmlFor="profile-phone" className="block text-xs tracking-wider uppercase font-medium mb-2" style={{ color: '#6B6560' }}>{t('account_phone')}</label>
                             <input
+                                id="profile-phone"
                                 type="tel"
                                 value={profileForm.data.phone}
                                 onChange={e => profileForm.setData('phone', e.target.value)}
@@ -118,8 +122,9 @@ export default function CustomerProfile({ customer }) {
                     <h2 className="text-xs tracking-widest uppercase font-medium mb-6" style={{ color: '#1A1A1A' }}>{t('account_change_password')}</h2>
                     <form onSubmit={submitPassword} className="space-y-4">
                         <div>
-                            <label className="block text-xs tracking-wider uppercase font-medium mb-2" style={{ color: '#6B6560' }}>{t('account_current_password')}</label>
+                            <label htmlFor="profile-current-password" className="block text-xs tracking-wider uppercase font-medium mb-2" style={{ color: '#6B6560' }}>{t('account_current_password')}</label>
                             <input
+                                id="profile-current-password"
                                 type="password"
                                 value={passwordForm.data.current_password}
                                 onChange={e => passwordForm.setData('current_password', e.target.value)}
@@ -133,8 +138,9 @@ export default function CustomerProfile({ customer }) {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-xs tracking-wider uppercase font-medium mb-2" style={{ color: '#6B6560' }}>{t('account_new_password')}</label>
+                                <label htmlFor="profile-new-password" className="block text-xs tracking-wider uppercase font-medium mb-2" style={{ color: '#6B6560' }}>{t('account_new_password')}</label>
                                 <input
+                                    id="profile-new-password"
                                     type="password"
                                     value={passwordForm.data.password}
                                     onChange={e => passwordForm.setData('password', e.target.value)}
@@ -146,8 +152,9 @@ export default function CustomerProfile({ customer }) {
                                 {passwordForm.errors.password && <p className="mt-1 text-xs text-red-600">{passwordForm.errors.password}</p>}
                             </div>
                             <div>
-                                <label className="block text-xs tracking-wider uppercase font-medium mb-2" style={{ color: '#6B6560' }}>{t('account_confirm_password')}</label>
+                                <label htmlFor="profile-confirm-password" className="block text-xs tracking-wider uppercase font-medium mb-2" style={{ color: '#6B6560' }}>{t('account_confirm_password')}</label>
                                 <input
+                                    id="profile-confirm-password"
                                     type="password"
                                     value={passwordForm.data.password_confirmation}
                                     onChange={e => passwordForm.setData('password_confirmation', e.target.value)}

@@ -68,7 +68,7 @@ function ReturnModal({ order, onClose, t }) {
                     <h3 className="font-serif text-base" style={{ color: '#1A1A1A' }}>
                         {t('account_return_modal_title')}
                     </h3>
-                    <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                    <button type="button" onClick={onClose} aria-label={t('nav_close')} className="text-gray-400 hover:text-gray-600">
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
@@ -105,6 +105,7 @@ function ReturnModal({ order, onClose, t }) {
                             onChange={e => setData('message', e.target.value)}
                             rows={3}
                             placeholder={t('account_return_placeholder')}
+                            aria-label={t('account_return_message_optional')}
                             className="w-full border px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-stone-400 resize-none"
                             style={{ borderColor: '#E8E2D9' }}
                         />

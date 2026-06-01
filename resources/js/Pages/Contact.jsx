@@ -132,20 +132,20 @@ export default function Contact() {
                             <form onSubmit={submit} className="space-y-5">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                     <div>
-                                        <label className="block text-xs font-medium tracking-wider uppercase mb-2" style={{ color: '#6B6560' }}>{t('contact_name')}</label>
-                                        <input type="text" value={data.name} onChange={(e) => setData('name', e.target.value)} style={{ ...inputStyle, borderColor: errors.name ? '#E07070' : '#D4CFC8' }} onFocus={(e) => e.target.style.borderColor = '#C8A96E'} onBlur={(e) => e.target.style.borderColor = errors.name ? '#E07070' : '#D4CFC8'} placeholder={t('contact_placeholder_name')} required />
+                                        <label htmlFor="contact-name" className="block text-xs font-medium tracking-wider uppercase mb-2" style={{ color: '#6B6560' }}>{t('contact_name')}</label>
+                                        <input id="contact-name" type="text" value={data.name} onChange={(e) => setData('name', e.target.value)} style={{ ...inputStyle, borderColor: errors.name ? '#E07070' : '#D4CFC8' }} onFocus={(e) => e.target.style.borderColor = '#C8A96E'} onBlur={(e) => e.target.style.borderColor = errors.name ? '#E07070' : '#D4CFC8'} placeholder={t('contact_placeholder_name')} required />
                                         {errors.name && <p className="text-xs mt-1" style={{ color: '#E07070' }}>{errors.name}</p>}
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-medium tracking-wider uppercase mb-2" style={{ color: '#6B6560' }}>{t('contact_email')}</label>
-                                        <input type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} style={{ ...inputStyle, borderColor: errors.email ? '#E07070' : '#D4CFC8' }} onFocus={(e) => e.target.style.borderColor = '#C8A96E'} onBlur={(e) => e.target.style.borderColor = errors.email ? '#E07070' : '#D4CFC8'} placeholder={t('contact_placeholder_email')} required />
+                                        <label htmlFor="contact-email" className="block text-xs font-medium tracking-wider uppercase mb-2" style={{ color: '#6B6560' }}>{t('contact_email')}</label>
+                                        <input id="contact-email" type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} style={{ ...inputStyle, borderColor: errors.email ? '#E07070' : '#D4CFC8' }} onFocus={(e) => e.target.style.borderColor = '#C8A96E'} onBlur={(e) => e.target.style.borderColor = errors.email ? '#E07070' : '#D4CFC8'} placeholder={t('contact_placeholder_email')} required />
                                         {errors.email && <p className="text-xs mt-1" style={{ color: '#E07070' }}>{errors.email}</p>}
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-medium tracking-wider uppercase mb-2" style={{ color: '#6B6560' }}>{t('contact_subject')}</label>
-                                    <select value={data.subject} onChange={(e) => setData('subject', e.target.value)} style={{ ...inputStyle, cursor: 'pointer', borderColor: errors.subject ? '#E07070' : '#D4CFC8' }} onFocus={(e) => e.target.style.borderColor = '#C8A96E'} onBlur={(e) => e.target.style.borderColor = errors.subject ? '#E07070' : '#D4CFC8'} required>
+                                    <label htmlFor="contact-subject" className="block text-xs font-medium tracking-wider uppercase mb-2" style={{ color: '#6B6560' }}>{t('contact_subject')}</label>
+                                    <select id="contact-subject" value={data.subject} onChange={(e) => setData('subject', e.target.value)} style={{ ...inputStyle, cursor: 'pointer', borderColor: errors.subject ? '#E07070' : '#D4CFC8' }} onFocus={(e) => e.target.style.borderColor = '#C8A96E'} onBlur={(e) => e.target.style.borderColor = errors.subject ? '#E07070' : '#D4CFC8'} required>
                                         <option value="">{t('contact_subject_placeholder')}</option>
                                         <option value="commande">{t('contact_subject_order')}</option>
                                         <option value="produit">{t('contact_subject_product')}</option>
@@ -157,8 +157,8 @@ export default function Contact() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-medium tracking-wider uppercase mb-2" style={{ color: '#6B6560' }}>{t('contact_message')}</label>
-                                    <textarea value={data.message} onChange={(e) => setData('message', e.target.value)} style={{ ...inputStyle, resize: 'vertical', minHeight: '160px', borderColor: errors.message ? '#E07070' : '#D4CFC8' }} onFocus={(e) => e.target.style.borderColor = '#C8A96E'} onBlur={(e) => e.target.style.borderColor = errors.message ? '#E07070' : '#D4CFC8'} placeholder={t('contact_message_placeholder')} required />
+                                    <label htmlFor="contact-message" className="block text-xs font-medium tracking-wider uppercase mb-2" style={{ color: '#6B6560' }}>{t('contact_message')}</label>
+                                    <textarea id="contact-message" value={data.message} onChange={(e) => setData('message', e.target.value)} style={{ ...inputStyle, resize: 'vertical', minHeight: '160px', borderColor: errors.message ? '#E07070' : '#D4CFC8' }} onFocus={(e) => e.target.style.borderColor = '#C8A96E'} onBlur={(e) => e.target.style.borderColor = errors.message ? '#E07070' : '#D4CFC8'} placeholder={t('contact_message_placeholder')} required />
                                     {errors.message && <p className="text-xs mt-1" style={{ color: '#E07070' }}>{errors.message}</p>}
                                 </div>
 

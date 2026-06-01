@@ -68,10 +68,11 @@ export default function CustomerLogin({ redirectTo = '' }) {
                 <form onSubmit={submit} className="space-y-6">
 
                     <div>
-                        <label className="block text-xs tracking-widest uppercase font-medium mb-2" style={{ color: '#1A1A1A' }}>
+                        <label htmlFor="login-email" className="block text-xs tracking-widest uppercase font-medium mb-2" style={{ color: '#1A1A1A' }}>
                             {t('account_email')}
                         </label>
                         <input
+                            id="login-email"
                             type="email"
                             value={data.email}
                             onChange={e => setData('email', e.target.value)}
