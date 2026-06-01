@@ -2,6 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import PublicLayout from '../Layouts/PublicLayout';
 import { useT } from '../contexts/LanguageContext';
+import { docTitle, withBrand } from '../i18n/docTitle';
 
 function FaqItem({ question, answer }) {
     const [open, setOpen] = useState(false);
@@ -59,8 +60,8 @@ export default function Faq() {
 
     return (
         <PublicLayout>
-            <Head title={`${t('faq_title')} — SoukJannah`}>
-                <meta head-key="description" name="description" content={t('meta_faq')} />
+            <Head title={docTitle(t, t('faq_title'))}>
+                <meta head-key="description" name="description" content={t('meta_faq', withBrand(t))} />
             </Head>
             {/* Fil d'ariane */}
             <div className="border-b" style={{ borderColor: '#E8E2D9', backgroundColor: '#FAF8F4' }}>

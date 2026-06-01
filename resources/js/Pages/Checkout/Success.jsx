@@ -1,12 +1,13 @@
 import { Head, Link } from '@inertiajs/react';
 import PublicLayout from '../../Layouts/PublicLayout';
 import { useT } from '../../contexts/LanguageContext';
+import { docTitle } from '../../i18n/docTitle';
 
 export default function CheckoutSuccess() {
     const { t } = useT();
     return (
         <PublicLayout>
-            <Head title={t('checkout_success_title')} />
+            <Head title={docTitle(t, t('checkout_success_title'))} />
             <div className="min-h-96 flex items-center justify-center py-32">
                 <div className="text-center max-w-md mx-auto px-4">
                     <div className="w-16 h-16 mx-auto mb-8 flex items-center justify-center border" style={{ borderColor: '#C8A96E' }}>

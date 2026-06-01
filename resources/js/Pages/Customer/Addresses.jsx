@@ -2,14 +2,15 @@ import { Head, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import CustomerLayout from '../../Layouts/CustomerLayout';
 import { useT } from '../../contexts/LanguageContext';
+import { docTitle } from '../../i18n/docTitle';
 
-const COUNTRIES = [
-    { code: 'CH', name: 'Suisse' }, { code: 'FR', name: 'France' },
-    { code: 'BE', name: 'Belgique' }, { code: 'LU', name: 'Luxembourg' },
-    { code: 'DE', name: 'Allemagne' }, { code: 'IT', name: 'Italie' },
-    { code: 'ES', name: 'Espagne' }, { code: 'PT', name: 'Portugal' },
-    { code: 'NL', name: 'Pays-Bas' }, { code: 'GB', name: 'Royaume-Uni' },
-];
+const COUNTRY_CODES = ['CH', 'FR', 'BE', 'LU', 'DE', 'IT', 'ES', 'PT', 'NL', 'GB'];
+
+function countryDisplayName(t, code) {
+    const key = `country_${code}`;
+    const translated = t(key);
+    return translated === key ? code : translated;
+}
 
 const emptyForm = {
     label: '', first_name: '', last_name: '', address: '',
@@ -64,7 +65,7 @@ function AddressForm({ initial = emptyForm, onSubmit, processing, errors, submit
                 <input type="text" value={form.data.address} onChange={e => form.setData('address', e.target.value)}
                     className="w-full px-3 py-2.5 border text-sm outline-none focus:border-amber-600"
                     style={{ borderColor: errors?.address ? '#dc2626' : '#D4CDBF', backgroundColor: '#FAF8F4' }}
-                    placeholder="Rue Exemple 12" required />
+                    placeholder={t('addr_street_placeholder')} required />
                 {errors?.address && <p className="mt-1 text-xs text-red-600">{errors.address}</p>}
             </div>
             <div>
@@ -92,7 +93,7 @@ function AddressForm({ initial = emptyForm, onSubmit, processing, errors, submit
                     <select value={form.data.country} onChange={e => form.setData('country', e.target.value)}
                         className="w-full px-3 py-2.5 border text-sm outline-none focus:border-amber-600"
                         style={{ borderColor: '#D4CDBF', backgroundColor: '#FAF8F4' }}>
-                        {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+                        {COUNTRY_CODES.map(code => <option key={code} value={code}>{t(`country_${code}`)}</option>)}
                     </select>
                 </div>
             </div>
@@ -101,7 +102,7 @@ function AddressForm({ initial = emptyForm, onSubmit, processing, errors, submit
                 <input type="tel" value={form.data.phone} onChange={e => form.setData('phone', e.target.value)}
                     className="w-full px-3 py-2.5 border text-sm outline-none focus:border-amber-600"
                     style={{ borderColor: '#D4CDBF', backgroundColor: '#FAF8F4' }}
-                    placeholder="+41 00 000 00 00" />
+                    placeholder={t('account_phone_placeholder')} />
             </div>
             <div className="flex items-center gap-3 pt-2">
                 <button type="submit" disabled={form.processing}
@@ -150,7 +151,7 @@ export default function CustomerAddresses({ addresses }) {
 
     return (
         <CustomerLayout title={t('account_nav_addresses')}>
-            <Head title={`${t('account_nav_addresses')} — SoukJannah`} />
+            <Head title={docTitle(t, t('account_nav_addresses'))} />
 
             {/* Liste des adresses */}
             {addresses.length > 0 && (
@@ -177,7 +178,7 @@ export default function CustomerAddresses({ addresses }) {
                                         </div>
                                         <p className="text-sm font-medium" style={{ color: '#1A1A1A' }}>{addr.first_name} {addr.last_name}</p>
                                         <p className="text-sm font-light" style={{ color: '#6B6560' }}>{addr.address}{addr.address2 ? `, ${addr.address2}` : ''}</p>
-                                        <p className="text-sm font-light" style={{ color: '#6B6560' }}>{addr.postal_code} {addr.city}, {addr.country}</p>
+                                        <p className="text-sm font-light" style={{ color: '#6B6560' }}>{addr.postal_code} {addr.city}, {countryDisplayName(t, addr.country)}</p>
                                         {addr.phone && <p className="text-sm font-light mt-1" style={{ color: '#9A9490' }}>{addr.phone}</p>}
                                     </div>
                                     <div className="flex flex-col gap-2 items-end">

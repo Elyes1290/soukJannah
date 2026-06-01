@@ -10,21 +10,34 @@ class ContactController extends Controller
     public function send(Request $request)
     {
         $data = $request->validate([
-            'name'    => 'required|string|max:100',
-            'email'   => 'required|email|max:150',
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|max:150',
             'subject' => 'required|string|max:100',
             'message' => 'required|string|max:2000',
+            'locale' => 'nullable|string|in:en,fr',
         ]);
 
-        $subjects = [
-            'commande'     => 'Ma commande',
-            'produit'      => 'Question sur un produit',
-            'livraison'    => 'Livraison & retours',
-            'partenariat'  => 'Partenariat / Collaboration',
-            'autre'        => 'Autre',
+        $locale = (($data['locale'] ?? '') === 'en') ? 'en' : 'fr';
+
+        $subjectLabelsEn = [
+            'commande' => 'My order',
+            'produit' => 'Question about a product',
+            'livraison' => 'Delivery & returns',
+            'partenariat' => 'Partnership / Collaboration',
+            'autre' => 'Other',
         ];
 
-        $subjectLabel = $subjects[$data['subject']] ?? $data['subject'];
+        $subjectLabelsFr = [
+            'commande' => 'Ma commande',
+            'produit' => 'Question sur un produit',
+            'livraison' => 'Livraison & retours',
+            'partenariat' => 'Partenariat / Collaboration',
+            'autre' => 'Autre',
+        ];
+
+        $labelsMap = $locale === 'en' ? $subjectLabelsEn : $subjectLabelsFr;
+
+        $subjectLabel = $labelsMap[$data['subject']] ?? $data['subject'];
 
         Mail::send([], [], function ($mail) use ($data, $subjectLabel) {
             $mail->to(config('mail.admin_address', env('ADMIN_EMAIL')))
@@ -32,10 +45,10 @@ class ContactController extends Controller
                 ->subject("[Contact] {$subjectLabel} — {$data['name']}")
                 ->html(
                     view('emails.contact', [
-                        'name'    => $data['name'],
-                        'email'   => $data['email'],
+                        'name' => $data['name'],
+                        'email' => $data['email'],
                         'subject' => $subjectLabel,
-                        'body'    => $data['message'],
+                        'body' => $data['message'],
                     ])->render()
                 );
         });

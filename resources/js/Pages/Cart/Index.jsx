@@ -2,6 +2,7 @@ import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import PublicLayout from '../../Layouts/PublicLayout';
 import { useT } from '../../contexts/LanguageContext';
+import { docTitle, withBrand } from '../../i18n/docTitle';
 
 function CartItem({ item }) {
     const { t } = useT();
@@ -39,9 +40,9 @@ function CartItem({ item }) {
 }
 
 function PromoField({ discountCode }) {
-    const { t } = useT();
+    const { t, translateFlash } = useT();
     const { flash } = usePage().props;
-    const [open, setOpen] = useState(!!discountCode || !!flash?.discount_error);
+    const [open, setOpen] = useState(!!discountCode || !!flash?.discount_error || !!flash?.discount_success);
     const { data, setData, post, processing } = useForm({ code: '' });
 
     const apply = (e) => {
@@ -52,11 +53,16 @@ function PromoField({ discountCode }) {
 
     return (
         <div className="mb-4">
+            {flash?.discount_success && (
+                <p className="text-xs font-medium mb-2" style={{ color: '#7B9E87' }}>
+                    {translateFlash(flash.discount_success)}
+                </p>
+            )}
             {discountCode ? (
                 <div className="flex items-center justify-between p-3 border" style={{ borderColor: '#C8A96E', backgroundColor: 'rgba(200,169,110,0.06)' }}>
                     <div>
                         <p className="text-xs font-medium" style={{ color: '#C8A96E' }}>
-                            Code <strong>{discountCode.code}</strong> {t('cart_promo_applied')}
+                            {t('cart_promo_code_label')} <strong>{discountCode.code}</strong> {t('cart_promo_applied')}
                         </p>
                         <p className="text-xs font-light" style={{ color: '#9A9490' }}>
                             {discountCode.type === 'percent' ? `-${discountCode.value}%` : `-${parseFloat(discountCode.value).toFixed(2)} CHF`}
@@ -85,11 +91,11 @@ function PromoField({ discountCode }) {
                                 required
                             />
                             <button type="submit" disabled={processing} className="px-4 py-2 text-xs font-medium tracking-widest uppercase transition-opacity" style={{ backgroundColor: '#1A1A1A', color: 'white', opacity: processing ? 0.6 : 1 }}>
-                                OK
+                                {t('cart_promo_apply_btn')}
                             </button>
                         </form>
                     )}
-                    {flash?.discount_error && <p className="text-xs mt-1 font-light" style={{ color: '#E07070' }}>{flash.discount_error}</p>}
+                    {flash?.discount_error && <p className="text-xs mt-1 font-light" style={{ color: '#E07070' }}>{translateFlash(flash.discount_error)}</p>}
                 </>
             )}
         </div>
@@ -102,8 +108,8 @@ export default function CartIndex({ cart }) {
     if (cart.items.length === 0) {
         return (
             <PublicLayout>
-                <Head title={`${t('cart_title')} — SoukJannah`}>
-                    <meta head-key="description" name="description" content={t('meta_cart')} />
+                <Head title={docTitle(t, t('cart_title'))}>
+                    <meta head-key="description" name="description" content={t('meta_cart', withBrand(t))} />
                 </Head>
                 <div className="max-w-xl mx-auto px-4 py-32 text-center">
                     <div className="h-px w-10 mx-auto mb-10" style={{ backgroundColor: '#C8A96E' }}></div>
@@ -117,8 +123,8 @@ export default function CartIndex({ cart }) {
 
     return (
         <PublicLayout>
-            <Head title={`${t('cart_title')} — SoukJannah`}>
-                <meta head-key="description" name="description" content={t('meta_cart')} />
+            <Head title={docTitle(t, t('cart_title'))}>
+                <meta head-key="description" name="description" content={t('meta_cart', withBrand(t))} />
             </Head>
             <section className="border-b py-12 text-center" style={{ backgroundColor: '#F0EBE1', borderColor: '#E8E2D9' }}>
                 <p className="text-xs tracking-[0.4em] uppercase mb-3 font-light" style={{ color: '#C8A96E' }}>{t('cart_tag')}</p>

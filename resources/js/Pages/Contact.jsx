@@ -1,9 +1,11 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
 import PublicLayout from '../Layouts/PublicLayout';
 import { useT } from '../contexts/LanguageContext';
+import { docTitle, withBrand } from '../i18n/docTitle';
 
 export default function Contact() {
-    const { t } = useT();
+    const { t, lang } = useT();
     const { flash, supportEmail } = usePage().props;
     const sent = flash?.contact_success || false;
 
@@ -12,7 +14,10 @@ export default function Contact() {
         email: '',
         subject: '',
         message: '',
+        locale: lang,
     });
+
+    useEffect(() => setData('locale', lang), [lang]);
 
     const submit = (e) => {
         e.preventDefault();
@@ -57,7 +62,7 @@ export default function Contact() {
                 </svg>
             ),
             label: t('contact_location_label'),
-            value: 'Switzerland',
+            value: t('country_CH'),
         },
     ];
 
@@ -70,8 +75,8 @@ export default function Contact() {
 
     return (
         <PublicLayout>
-            <Head title={`${t('contact_title')} — SoukJannah`}>
-                <meta head-key="description" name="description" content={t('meta_contact')} />
+            <Head title={docTitle(t, t('contact_title'))}>
+                <meta head-key="description" name="description" content={t('meta_contact', withBrand(t))} />
             </Head>
             <section className="border-b py-24 text-center" style={{ backgroundColor: '#F0EBE1', borderColor: '#E8E2D9' }}>
                 <p className="text-xs tracking-[0.4em] uppercase mb-5 font-light" style={{ color: '#C8A96E' }}>{t('contact_tag')}</p>
@@ -128,12 +133,12 @@ export default function Contact() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                     <div>
                                         <label className="block text-xs font-medium tracking-wider uppercase mb-2" style={{ color: '#6B6560' }}>{t('contact_name')}</label>
-                                        <input type="text" value={data.name} onChange={(e) => setData('name', e.target.value)} style={{ ...inputStyle, borderColor: errors.name ? '#E07070' : '#D4CFC8' }} onFocus={(e) => e.target.style.borderColor = '#C8A96E'} onBlur={(e) => e.target.style.borderColor = errors.name ? '#E07070' : '#D4CFC8'} placeholder="First Last" required />
+                                        <input type="text" value={data.name} onChange={(e) => setData('name', e.target.value)} style={{ ...inputStyle, borderColor: errors.name ? '#E07070' : '#D4CFC8' }} onFocus={(e) => e.target.style.borderColor = '#C8A96E'} onBlur={(e) => e.target.style.borderColor = errors.name ? '#E07070' : '#D4CFC8'} placeholder={t('contact_placeholder_name')} required />
                                         {errors.name && <p className="text-xs mt-1" style={{ color: '#E07070' }}>{errors.name}</p>}
                                     </div>
                                     <div>
                                         <label className="block text-xs font-medium tracking-wider uppercase mb-2" style={{ color: '#6B6560' }}>{t('contact_email')}</label>
-                                        <input type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} style={{ ...inputStyle, borderColor: errors.email ? '#E07070' : '#D4CFC8' }} onFocus={(e) => e.target.style.borderColor = '#C8A96E'} onBlur={(e) => e.target.style.borderColor = errors.email ? '#E07070' : '#D4CFC8'} placeholder="vous@example.com" required />
+                                        <input type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} style={{ ...inputStyle, borderColor: errors.email ? '#E07070' : '#D4CFC8' }} onFocus={(e) => e.target.style.borderColor = '#C8A96E'} onBlur={(e) => e.target.style.borderColor = errors.email ? '#E07070' : '#D4CFC8'} placeholder={t('contact_placeholder_email')} required />
                                         {errors.email && <p className="text-xs mt-1" style={{ color: '#E07070' }}>{errors.email}</p>}
                                     </div>
                                 </div>

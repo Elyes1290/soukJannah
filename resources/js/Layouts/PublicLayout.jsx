@@ -1,32 +1,35 @@
 import { Link, usePage, useForm } from "@inertiajs/react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Analytics from "../Components/Analytics";
 import CookieBanner from "../Components/CookieBanner";
 import { useT } from "../contexts/LanguageContext";
 
-function NewsletterForm({ lang }) {
+function NewsletterForm() {
+    const { t, lang } = useT();
     const { flash } = usePage().props;
-    const { data, setData, post, processing, reset } = useForm({ email: '', locale: lang || 'fr' });
+    const { data, setData, post, processing, reset } = useForm({ email: '', locale: lang });
     const success = flash?.newsletter_success;
+
+    useEffect(() => {
+        setData('locale', lang);
+    }, [lang, setData]);
 
     const submit = (e) => {
         e.preventDefault();
-        post('/newsletter/subscribe', { onSuccess: () => reset() });
+        post('/newsletter/subscribe', { onSuccess: () => reset('email') });
     };
 
     return (
-        <div className="border-t border-b py-10 mb-12" style={{ borderColor: '#2C2C2C' }}>
+        <div id="newsletter" className="border-t border-b py-10 mb-12 scroll-mt-24" style={{ borderColor: '#2C2C2C' }}>
             <div className="max-w-xl mx-auto text-center">
                 <p className="text-xs tracking-[0.3em] uppercase mb-2" style={{ color: '#C8A96E' }}>
-                    Newsletter
+                    {t('newsletter_tag')}
                 </p>
                 <h3 className="font-serif text-xl mb-2" style={{ color: '#FAF8F4' }}>
-                    {lang === 'fr' ? 'Offres exclusives & nouveautés' : 'Exclusive offers & new arrivals'}
+                    {t('newsletter_title')}
                 </h3>
                 <p className="text-xs mb-6 font-light" style={{ color: '#6B6560' }}>
-                    {lang === 'fr'
-                        ? 'Inscrivez-vous pour recevoir nos meilleures offres et être informé des nouveaux produits.'
-                        : 'Subscribe to receive our best deals and be notified of new products.'}
+                    {t('newsletter_intro')}
                 </p>
 
                 {success ? (
@@ -34,7 +37,7 @@ function NewsletterForm({ lang }) {
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        {lang === 'fr' ? 'Merci pour votre inscription !' : 'Thank you for subscribing!'}
+                        {t('newsletter_success')}
                     </div>
                 ) : (
                     <form onSubmit={submit} className="flex gap-0 max-w-sm mx-auto">
@@ -42,7 +45,7 @@ function NewsletterForm({ lang }) {
                             type="email"
                             value={data.email}
                             onChange={e => setData('email', e.target.value)}
-                            placeholder={lang === 'fr' ? 'Votre adresse email' : 'Your email address'}
+                            placeholder={t('newsletter_placeholder')}
                             required
                             className="flex-1 px-4 py-3 text-sm font-light outline-none"
                             style={{ backgroundColor: '#2C2C2C', color: '#FAF8F4', border: '1px solid #3C3C3C', borderRight: 'none' }}
@@ -53,7 +56,7 @@ function NewsletterForm({ lang }) {
                             className="px-5 py-3 text-xs font-medium uppercase tracking-wider flex-shrink-0 transition-colors disabled:opacity-50"
                             style={{ backgroundColor: '#C8A96E', color: '#1A1A1A', letterSpacing: '0.1em' }}
                         >
-                            {processing ? '...' : (lang === 'fr' ? "S'inscrire" : 'Subscribe')}
+                            {processing ? t('newsletter_sending') : t('newsletter_submit')}
                         </button>
                     </form>
                 )}
@@ -70,7 +73,7 @@ export default function PublicLayout({ children }) {
         authCustomer,
         popularSearches = [],
     } = usePage().props;
-    const shopName = settings?.shop_name || "SoukJannah";
+    const shopName = settings?.shop_name || t("brand_name");
     const { t, lang, switchLang } = useT();
 
     const getInitialConsent = () => {
@@ -256,7 +259,7 @@ export default function PublicLayout({ children }) {
                                     {navCategories.length > 0 && (
                                         <div className="px-5 pt-4 pb-3">
                                             <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: "#C8A96E" }}>
-                                                Catégories
+                                                {t("nav_categories")}
                                             </p>
                                             <div className="flex flex-wrap gap-2">
                                                 {navCategories.slice(0, 6).map(cat => (
@@ -274,7 +277,7 @@ export default function PublicLayout({ children }) {
                                     {popularSearches.length > 0 && (
                                         <div className="px-5 py-4 border-t" style={{ borderColor: "#F0EBE1" }}>
                                             <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: "#C8A96E" }}>
-                                                Populaires en ce moment
+                                                {t("nav_search_popular_heading")}
                                             </p>
                                             <div className="grid grid-cols-2 gap-y-2 gap-x-4">
                                                 {popularSearches.map(term => (
@@ -1034,18 +1037,6 @@ export default function PublicLayout({ children }) {
                                             </Link>
                                         </li>
                                     ))}
-                                    {navCategories.length > 0 &&
-                                        navCategories.map((cat) => (
-                                            <li key={cat.slug}>
-                                                <Link
-                                                    href={`/boutique?categorie=${cat.slug}`}
-                                                    className="text-xs hover:text-white transition-colors"
-                                                    style={{ color: "#9A9490" }}
-                                                >
-                                                    {cat.name}
-                                                </Link>
-                                            </li>
-                                        ))}
                                 </ul>
                             </div>
                             <div>
@@ -1059,7 +1050,7 @@ export default function PublicLayout({ children }) {
                                     {[
                                         [t("footer_delivery"), "/livraison"],
                                         [t("footer_faq"), "/faq"],
-                                        ["Suivi de commande", "/suivi"],
+                                        [t("tracking_page_title"), "/suivi"],
                                         [
                                             t("footer_legal"),
                                             "/mentions-legales",
@@ -1079,7 +1070,7 @@ export default function PublicLayout({ children }) {
                             </div>
                         </div>
                         {/* Newsletter */}
-                        <NewsletterForm lang={lang} />
+                        <NewsletterForm />
 
                         <div
                             className="border-t pt-8 flex flex-col md:flex-row justify-between items-center gap-4"

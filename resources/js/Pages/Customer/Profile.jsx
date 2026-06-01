@@ -2,6 +2,7 @@ import { Head } from '@inertiajs/react';
 import { useForm } from '@inertiajs/react';
 import CustomerLayout from '../../Layouts/CustomerLayout';
 import { useT } from '../../contexts/LanguageContext';
+import { docTitle } from '../../i18n/docTitle';
 
 export default function CustomerProfile({ customer }) {
     const { t } = useT();
@@ -33,7 +34,7 @@ export default function CustomerProfile({ customer }) {
 
     return (
         <CustomerLayout title={t('account_nav_profile')}>
-            <Head title={`${t('account_nav_profile')} — SoukJannah`} />
+            <Head title={docTitle(t, t('account_nav_profile'))} />
 
             <div className="space-y-10">
 

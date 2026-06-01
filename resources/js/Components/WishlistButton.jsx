@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { usePage, router } from '@inertiajs/react';
+import { useT } from '../contexts/LanguageContext';
 
 export default function WishlistButton({ productId, size = 'md', className = '' }) {
+    const { t } = useT();
     const { wishlistIds, authCustomer } = usePage().props;
     const [inWishlist, setInWishlist] = useState(
         Array.isArray(wishlistIds) && wishlistIds.includes(productId)
@@ -48,7 +50,7 @@ export default function WishlistButton({ productId, size = 'md', className = '' 
     return (
         <button
             onClick={handleClick}
-            title={inWishlist ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+            title={inWishlist ? t('wishlist_a11y_remove') : t('wishlist_a11y_add')}
             className={`${btnSize} rounded-full transition-all ${loading ? 'opacity-50' : 'hover:scale-110'} ${className}`}
             style={{ backgroundColor: 'rgba(255,255,255,0.9)' }}
         >

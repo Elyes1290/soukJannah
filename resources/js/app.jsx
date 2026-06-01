@@ -5,7 +5,6 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { LanguageProvider } from './contexts/LanguageContext';
 
 createInertiaApp({
-    title: (title) => `${title} — SoukJannah`,
     resolve: (name) =>
         resolvePageComponent(
             `./Pages/${name}.jsx`,

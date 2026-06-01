@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\Category;
 use App\Models\Customer;
+use App\Models\Product;
 use App\Models\Setting;
 use App\Models\Wishlist;
 use App\Services\CartService;
@@ -100,9 +101,10 @@ class HandleInertiaRequests extends Middleware
                 'ga4_id' => Setting::get('ga4_id'),
                 'shop_name' => Setting::get('shop_name', 'SoukJannah'),
             ],
-            /** Affichage public (footer, contact, légal) — aligné sur MAIL_FROM_ADDRESS */
-            'supportEmail' => config('mail.from.address'),
+            /** Email de contact affiché (voir config/shop.php — SUPPORT_CONTACT_EMAIL). */
+            'supportEmail' => config('shop.support_contact_email'),
             'siteHost' => parse_url((string) config('app.url', 'http://localhost'), PHP_URL_HOST) ?: '',
+            'catalogComingSoon' => Product::catalogIsComingSoon(),
         ];
     }
 }

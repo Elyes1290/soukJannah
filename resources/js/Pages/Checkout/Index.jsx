@@ -2,6 +2,7 @@ import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import PublicLayout from '../../Layouts/PublicLayout';
 import { useT } from '../../contexts/LanguageContext';
+import { docTitle, withBrand } from '../../i18n/docTitle';
 
 export default function CheckoutIndex({ cart }) {
     const { t, lang } = useT();
@@ -17,8 +18,8 @@ export default function CheckoutIndex({ cart }) {
 
     return (
         <PublicLayout>
-            <Head title={`${t('checkout_title')} — SoukJannah`}>
-                <meta head-key="description" name="description" content={t('meta_checkout')} />
+            <Head title={docTitle(t, t('checkout_title'))}>
+                <meta head-key="description" name="description" content={t('meta_checkout', withBrand(t))} />
             </Head>
             <section className="border-b py-12 text-center" style={{ backgroundColor: '#F0EBE1', borderColor: '#E8E2D9' }}>
                 <p className="text-xs tracking-[0.4em] uppercase mb-3 font-light" style={{ color: '#C8A96E' }}>{t('checkout_tag')}</p>
@@ -45,14 +46,14 @@ export default function CheckoutIndex({ cart }) {
                         {/* Note de commande */}
                         <div className="pt-8">
                             <p className="text-xs tracking-widest uppercase mb-3 font-medium" style={{ color: '#1A1A1A' }}>
-                                {lang === 'fr' ? 'Note (optionnel)' : 'Order note (optional)'}
+                                {t('checkout_order_note_optional')}
                             </p>
                             <textarea
                                 value={orderNote}
                                 onChange={e => setOrderNote(e.target.value)}
                                 rows={2}
                                 maxLength={300}
-                                placeholder={lang === 'fr' ? 'Instructions spéciales, allergie, préférence de livraison...' : 'Special instructions, allergy, delivery preference...'}
+                                placeholder={t('checkout_order_note_placeholder')}
                                 className="w-full border px-4 py-3 text-sm font-light focus:outline-none focus:ring-1 focus:ring-stone-400 resize-none"
                                 style={{ borderColor: '#E8E2D9', backgroundColor: '#FAF8F4', color: '#1A1A1A' }}
                             />
@@ -69,7 +70,7 @@ export default function CheckoutIndex({ cart }) {
                                     {isGift && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>}
                                 </div>
                                 <span className="text-sm font-light" style={{ color: '#1A1A1A' }}>
-                                    🎁 {lang === 'fr' ? "C'est un cadeau" : "This is a gift"}
+                                    🎁 {t('checkout_is_gift')}
                                 </span>
                             </label>
                             {isGift && (
@@ -78,7 +79,7 @@ export default function CheckoutIndex({ cart }) {
                                     onChange={e => setGiftMessage(e.target.value)}
                                     rows={2}
                                     maxLength={300}
-                                    placeholder={lang === 'fr' ? 'Votre message personnalisé...' : 'Your personal message...'}
+                                    placeholder={t('checkout_gift_message_placeholder')}
                                     className="w-full mt-3 border px-4 py-3 text-sm font-light focus:outline-none focus:ring-1 focus:ring-amber-300 resize-none"
                                     style={{ borderColor: '#C8A96E', backgroundColor: '#FFF8ED', color: '#1A1A1A' }}
                                 />

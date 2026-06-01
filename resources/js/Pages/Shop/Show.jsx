@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import PublicLayout from '../../Layouts/PublicLayout';
 import { useT } from '../../contexts/LanguageContext';
 import WishlistButton from '../../Components/WishlistButton';
+import { docTitle } from '../../i18n/docTitle';
 
 function Lightbox({ src, alt, onClose }) {
     const close = useCallback((e) => {
@@ -115,7 +116,7 @@ function ReviewForm({ product, orderId, t }) {
                 <button type="submit" disabled={form.processing}
                     className="px-8 py-3 text-xs font-medium uppercase tracking-widest disabled:opacity-50 transition-colors"
                     style={{ backgroundColor: '#1A1A1A', color: 'white' }}>
-                    {form.processing ? '...' : t('review_submit')}
+                    {form.processing ? t('newsletter_sending') : t('review_submit')}
                 </button>
             </form>
         </div>
@@ -153,7 +154,7 @@ function saveRecentlyViewed(product) {
 
 export default function ShopShow({ product, auth }) {
     const { t, lang } = useT();
-    const { authCustomer } = usePage().props;
+    const { authCustomer, settings } = usePage().props;
     const [selectedImage, setSelectedImage] = useState(product.main_image_url);
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [quantity, setQuantity] = useState(1);
@@ -161,11 +162,11 @@ export default function ShopShow({ product, auth }) {
     const [recentlyViewed, setRecentlyViewed] = useState([]);
     const [copied, setCopied] = useState(false);
 
+    const brandForSchema = settings?.shop_name || t('brand_name');
+
     const shareWhatsApp = () => {
         const url = window.location.href;
-        const text = lang === 'fr'
-            ? `Regarde ce produit sur SoukJannah : ${product.name} — ${url}`
-            : `Check out this product on SoukJannah: ${product.name} — ${url}`;
+        const text = t('product_share_whatsapp', { brand: t('brand_name'), name: product.name, url });
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     };
 
@@ -230,7 +231,7 @@ export default function ShopShow({ product, auth }) {
         name: product.name,
         description: product.short_description || product.description || '',
         sku: product.sku || undefined,
-        brand: { '@type': 'Brand', name: 'SoukJannah' },
+        brand: { '@type': 'Brand', name: brandForSchema },
         image: allImages.map(i => i.url || i.path).filter(Boolean),
         offers: {
             '@type': 'Offer',
@@ -241,7 +242,7 @@ export default function ShopShow({ product, auth }) {
             availability: product.stock > 0
                 ? 'https://schema.org/InStock'
                 : 'https://schema.org/OutOfStock',
-            seller: { '@type': 'Organization', name: 'SoukJannah' },
+            seller: { '@type': 'Organization', name: brandForSchema },
         },
         ...(avgRating && reviewCount > 0 ? {
             aggregateRating: {
@@ -269,7 +270,7 @@ export default function ShopShow({ product, auth }) {
     return (
         <PublicLayout>
             {lightboxOpen && <Lightbox src={selectedImage} alt={product.name} onClose={() => setLightboxOpen(false)} />}
-            <Head title={`${product.name} — SoukJannah`}>
+            <Head title={docTitle(t, product.name)}>
                 <meta head-key="description" name="description" content={(product.og?.description || product.short_description || product.name).slice(0, 170)} />
                 <meta head-key="og:type"        property="og:type"        content="product" />
                 <meta head-key="og:title"       property="og:title"       content={product.og.title} />
@@ -397,7 +398,7 @@ export default function ShopShow({ product, auth }) {
                                 {/* Partage */}
                                 <div className="flex items-center gap-3 pt-1">
                                     <span className="text-xs font-light" style={{ color: '#9A9490' }}>
-                                        {lang === 'fr' ? 'Partager' : 'Share'}
+                                        {t('product_share')}
                                     </span>
                                     <button onClick={shareWhatsApp} title="WhatsApp" className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-light border transition-colors hover:bg-green-50" style={{ borderColor: '#E8E2D9', color: '#25D366' }}>
                                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -405,13 +406,13 @@ export default function ShopShow({ product, auth }) {
                                         </svg>
                                         WhatsApp
                                     </button>
-                                    <button onClick={copyLink} title={lang === 'fr' ? 'Copier le lien' : 'Copy link'} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-light border transition-colors hover:bg-gray-50" style={{ borderColor: '#E8E2D9', color: copied ? '#7B9E87' : '#6B6560' }}>
+                                    <button onClick={copyLink} title={t('product_copy_link_title')} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-light border transition-colors hover:bg-gray-50" style={{ borderColor: '#E8E2D9', color: copied ? '#7B9E87' : '#6B6560' }}>
                                         {copied ? (
                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
                                         ) : (
                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"/></svg>
                                         )}
-                                        {copied ? (lang === 'fr' ? 'Copié !' : 'Copied!') : (lang === 'fr' ? 'Copier le lien' : 'Copy link')}
+                                        {copied ? t('product_copied') : t('product_copy_link')}
                                     </button>
                                 </div>
                             </div>
@@ -425,19 +426,19 @@ export default function ShopShow({ product, auth }) {
                                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        {lang === 'fr' ? 'Vous serez notifié(e) dès le retour en stock !' : 'You will be notified when back in stock!'}
+                                        {t('product_stock_alert_confirm')}
                                     </div>
                                 ) : (
                                     <>
                                         <p className="text-xs mb-3 font-light" style={{ color: '#6B6560' }}>
-                                            {lang === 'fr' ? 'Laissez votre email pour être prévenu(e) dès que ce produit est disponible.' : 'Leave your email to be notified as soon as this product is available.'}
+                                            {t('product_stock_alert_hint')}
                                         </p>
                                         <form onSubmit={subscribeStockAlert} className="flex gap-0">
                                             <input
                                                 type="email"
                                                 value={alertEmail}
                                                 onChange={e => setAlertEmail(e.target.value)}
-                                                placeholder={lang === 'fr' ? 'Votre email' : 'Your email'}
+                                                placeholder={t('account_email_placeholder')}
                                                 required
                                                 className="flex-1 px-3 py-2.5 text-sm outline-none border"
                                                 style={{ borderColor: '#D4CFC8', borderRight: 'none' }}
@@ -448,7 +449,7 @@ export default function ShopShow({ product, auth }) {
                                                 className="px-4 py-2.5 text-xs font-medium uppercase tracking-wider flex-shrink-0 transition-opacity disabled:opacity-50"
                                                 style={{ backgroundColor: '#1A1A1A', color: '#FAF8F4', letterSpacing: '0.1em' }}
                                             >
-                                                {lang === 'fr' ? 'Me prévenir' : 'Notify me'}
+                                                {t('product_notify_me')}
                                             </button>
                                         </form>
                                     </>
@@ -544,7 +545,7 @@ export default function ShopShow({ product, auth }) {
                                                                 <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                                                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                                                 </svg>
-                                                                {lang === 'fr' ? 'Achat vérifié' : 'Verified purchase'}
+                                                                {t('review_verified_purchase')}
                                                             </span>
                                                         )}
                                                     </div>
@@ -566,7 +567,7 @@ export default function ShopShow({ product, auth }) {
                 <section className="border-t py-12" style={{ borderColor: '#E8E2D9', backgroundColor: '#FAF8F4' }}>
                     <div className="max-w-6xl mx-auto px-4">
                         <p className="text-xs tracking-[0.3em] uppercase font-medium mb-6" style={{ color: '#9A9490' }}>
-                            {lang === 'fr' ? 'Récemment consultés' : 'Recently viewed'}
+                            {t('product_recently_viewed')}
                         </p>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                             {recentlyViewed.map(p => {

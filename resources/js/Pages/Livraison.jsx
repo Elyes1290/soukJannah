@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import PublicLayout from '../Layouts/PublicLayout';
 import { useT } from '../contexts/LanguageContext';
+import { docTitle, withBrand } from '../i18n/docTitle';
 
 function Section({ title, children }) {
     return (
@@ -19,8 +20,8 @@ export default function Livraison() {
 
     return (
         <PublicLayout>
-            <Head title={`${t('delivery_title')} — SoukJannah`}>
-                <meta head-key="description" name="description" content={t('meta_delivery')} />
+            <Head title={docTitle(t, t('delivery_title'))}>
+                <meta head-key="description" name="description" content={t('meta_delivery', withBrand(t))} />
             </Head>
             {/* Fil d'ariane */}
             <div className="border-b" style={{ borderColor: '#E8E2D9', backgroundColor: '#FAF8F4' }}>

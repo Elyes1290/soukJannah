@@ -74,15 +74,7 @@ class HomeController extends Controller
             ->orderByDesc('published_at')
             ->take(3)
             ->get()
-            ->map(fn($p) => [
-                'id'              => $p->id,
-                'title'           => $p->title,
-                'slug'            => $p->slug,
-                'excerpt'         => $p->excerpt,
-                'cover_image_url' => $p->cover_image_url,
-                'published_at'    => $p->published_at?->format('M j, Y'),
-                'reading_time'    => $p->reading_time,
-            ]);
+            ->map->toPublicPayload();
 
         $stats = [
             'orders_shipped'  => Order::whereIn('status', ['shipped', 'delivered'])->count(),

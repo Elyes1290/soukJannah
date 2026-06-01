@@ -42,6 +42,32 @@ label[htmlFor] {
 .prose-blog img { width: 100%; margin: 1.5rem 0; }
 .prose-blog blockquote { border-left: 3px solid #C8A96E; padding-left: 1.25rem; margin: 1.5rem 0; font-style: italic; color: #6B6560; }
 
+/* Couverture article blog : ratio 16:9 — image source en 1920×1080 */
+.blog-cover-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background-color: #F0EBE1;
+}
+.blog-cover-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+}
+.blog-cover-vignette {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(250, 248, 244, 0.06) 0%,
+        transparent 50%,
+        rgba(250, 248, 244, 0.22) 100%
+    );
+}
+
 body {
     background-color: #FAF8F4;
     color: #1A1A1A;
@@ -86,6 +112,75 @@ body {
     color: white;
 }
 
+/* Home — accentuation des CTA (hero + fermeture) */
+.btn-home-hero {
+    padding: 1rem 2.25rem;
+    font-size: 0.8125rem;
+    letter-spacing: 0.14em;
+    border-radius: 2px;
+    box-shadow:
+        0 4px 6px rgb(26 26 26 / 0.08),
+        0 12px 36px rgb(26 26 26 / 0.16);
+    transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        background-color 0.2s ease;
+}
+.btn-home-hero:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 6px 12px rgb(26 26 26 / 0.1),
+        0 18px 42px rgb(26 26 26 / 0.2);
+}
+
+.btn-hero-secondary {
+    padding: 0.9375rem 2rem;
+    font-size: 0.8125rem;
+    letter-spacing: 0.12em;
+    border-radius: 2px;
+    border: 1px solid rgb(26 26 26 / 0.35);
+    color: #1a1a1a;
+    background-color: rgb(250 248 244 / 0.55);
+    backdrop-filter: blur(6px);
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        color 0.2s ease;
+    display: inline-block;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+.btn-hero-secondary:hover {
+    background-color: rgb(250 248 244 / 0.92);
+    border-color: #1a1a1a;
+    transform: translateY(-1px);
+}
+
+.btn-home-close {
+    background-color: var(--color-gold, #c8a96e);
+    color: #1a1a1a;
+    padding: 1rem 2.75rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    display: inline-block;
+    text-align: center;
+    box-shadow: 0 10px 40px rgb(200 169 110 / 0.35);
+    transition:
+        transform 0.2s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+.btn-home-close:hover {
+    background-color: var(--color-gold-light, #e8d5b0);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 44px rgb(200 169 110 / 0.4);
+}
+
 /* Séparateur doré */
 .gold-line {
     width: 40px;
@@ -114,7 +209,7 @@ body {
 ::-webkit-scrollbar-track { background: #FAF8F4; }
 ::-webkit-scrollbar-thumb { background: #D4CFC8; border-radius: 3px; }
 
-/* Hero home : object-position forcée — les arbitrary Tailwind peuvent être ignorées selon la build */
+/* Hero home : home-hero-banner.png — recadrage CSS selon viewport */
 .hero-banner-cover {
     width: 100%;
     height: 100%;
@@ -123,12 +218,29 @@ body {
 }
 @media (max-width: 767px) {
     .hero-banner-cover {
-        /* % horizontal élevé = ancré vers la droite de la photo */
-        object-position: 80% 20%;
+        object-position: 58% 42%;
     }
 }
 @media (min-width: 768px) {
     .hero-banner-cover {
-        object-position: 12% 30%;
+        object-position: 72% center;
+    }
+}
+
+/* Page À propos : bannière about-hero-banner.png */
+.hero-about-cover {
+    width: 100%;
+    height: 100%;
+    min-height: 380px;
+    object-fit: cover;
+}
+@media (max-width: 767px) {
+    .hero-about-cover {
+        object-position: 55% center;
+    }
+}
+@media (min-width: 768px) {
+    .hero-about-cover {
+        object-position: 62% center;
     }
 }

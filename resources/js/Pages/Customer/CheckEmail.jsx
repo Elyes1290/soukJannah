@@ -1,13 +1,14 @@
 import { Head } from '@inertiajs/react';
 import PublicLayout from '../../Layouts/PublicLayout';
 import { useT } from '../../contexts/LanguageContext';
+import { docTitle } from '../../i18n/docTitle';
 
 export default function CheckEmail({ email }) {
     const { t } = useT();
 
     return (
         <PublicLayout>
-            <Head title={`${t('account_check_email_title')} — SoukJannah`} />
+            <Head title={docTitle(t, t('account_check_email_title'))} />
 
             <section className="border-b py-12 text-center" style={{ backgroundColor: '#F0EBE1', borderColor: '#E8E2D9' }}>
                 <p className="text-xs tracking-[0.4em] uppercase mb-3 font-light" style={{ color: '#C8A96E' }}>{t('account_tag')}</p>

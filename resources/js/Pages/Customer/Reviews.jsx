@@ -2,6 +2,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import CustomerLayout from '../../Layouts/CustomerLayout';
 import { useT } from '../../contexts/LanguageContext';
+import { docTitle } from '../../i18n/docTitle';
 
 function StarPicker({ value, onChange }) {
     const [hovered, setHovered] = useState(0);
@@ -56,7 +57,7 @@ export default function CustomerReviews({ reviews, reviewableProducts }) {
 
     return (
         <CustomerLayout title={t('account_nav_reviews')}>
-            <Head title={`${t('account_nav_reviews')} — SoukJannah`} />
+            <Head title={docTitle(t, t('account_nav_reviews'))} />
 
             {/* Écrire un avis */}
             {reviewableProducts.length > 0 && (
@@ -101,8 +102,9 @@ export default function CustomerReviews({ reviews, reviewableProducts }) {
                                         className="w-full px-3 py-2.5 border text-sm outline-none focus:border-amber-600 resize-none"
                                         style={{ borderColor: form.errors.content ? '#dc2626' : '#D4CDBF', backgroundColor: '#FAF8F4' }}
                                         placeholder={t('review_placeholder')} required />
-                                    {form.errors.content && <p className="mt-1 text-xs text-red-600">{form.errors.content}</p>}
+                                    {form.errors.content && <p className="mt-1 text-xs text-red-600">{t(form.errors.content)}</p>}
                                 </div>
+                                {form.errors.duplicate_review && <p className="mb-2 text-xs text-red-600">{t(form.errors.duplicate_review)}</p>}
                                 <div className="flex items-center gap-3">
                                     <button type="submit" disabled={form.processing}
                                         className="px-7 py-2.5 text-xs font-medium uppercase tracking-widest disabled:opacity-50"

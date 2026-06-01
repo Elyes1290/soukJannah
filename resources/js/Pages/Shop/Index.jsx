@@ -1,8 +1,9 @@
-import { Head, Link, router } from '@inertiajs/react';
-import { useState, useRef } from 'react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { useState, useRef, useEffect } from 'react';
 import PublicLayout from '../../Layouts/PublicLayout';
 import { useT } from '../../contexts/LanguageContext';
 import WishlistButton from '../../Components/WishlistButton';
+import { docTitle, withBrand } from '../../i18n/docTitle';
 
 function SortDropdown({ activeSort, onChange }) {
     const { t } = useT();
@@ -18,9 +19,18 @@ function SortDropdown({ activeSort, onChange }) {
 
     const current = SORT_OPTIONS.find(o => o.value === activeSort) ?? SORT_OPTIONS[0];
 
+    useEffect(() => {
+        if (!open) return;
+        const close = (e) => {
+            if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+        };
+        document.addEventListener('mousedown', close);
+        return () => document.removeEventListener('mousedown', close);
+    }, [open]);
+
     return (
-        <div className="relative" ref={ref}>
-            <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border transition-colors whitespace-nowrap" style={{ borderColor: open ? '#C8A96E' : '#E8E2D9', color: '#1A1A1A', backgroundColor: 'white' }}>
+        <div className="relative flex-shrink-0" ref={ref}>
+            <button type="button" onClick={() => setOpen(!open)} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border transition-colors whitespace-nowrap" style={{ borderColor: open ? '#C8A96E' : '#E8E2D9', color: '#1A1A1A', backgroundColor: 'white' }}>
                 <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ color: '#C8A96E' }}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 7h18M6 12h12M9 17h6" />
                 </svg>
@@ -30,9 +40,9 @@ function SortDropdown({ activeSort, onChange }) {
                 </svg>
             </button>
             {open && (
-                <div className="absolute left-0 top-full mt-1 bg-white border z-50 shadow-sm" style={{ borderColor: '#E8E2D9', minWidth: '180px', borderTop: '2px solid #C8A96E' }}>
+                <div className="absolute left-0 top-full mt-1 bg-white border z-[100] shadow-lg" style={{ borderColor: '#E8E2D9', minWidth: '180px', borderTop: '2px solid #C8A96E' }}>
                     {SORT_OPTIONS.map((opt) => (
-                        <button key={opt.value} onClick={() => { onChange(opt.value); setOpen(false); }} className="w-full text-left px-4 py-2.5 text-xs transition-colors flex items-center justify-between" style={{ color: activeSort === opt.value ? '#C8A96E' : '#1A1A1A', backgroundColor: activeSort === opt.value ? '#FAF8F4' : 'white', fontWeight: activeSort === opt.value ? '500' : '300' }}>
+                        <button type="button" key={opt.value} onClick={() => { onChange(opt.value); setOpen(false); }} className="w-full text-left px-4 py-2.5 text-xs transition-colors flex items-center justify-between" style={{ color: activeSort === opt.value ? '#C8A96E' : '#1A1A1A', backgroundColor: activeSort === opt.value ? '#FAF8F4' : 'white', fontWeight: activeSort === opt.value ? '500' : '300' }}>
                             {opt.label}
                             {activeSort === opt.value && (
                                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} style={{ color: '#C8A96E' }}>
@@ -168,8 +178,71 @@ function Pagination({ pagination, onPageChange }) {
     );
 }
 
+function ShopComingSoon() {
+    const { t } = useT();
+
+    const benefits = [
+        { icon: '✦', text: t('shop_coming_soon_b1') },
+        { icon: '◈', text: t('shop_coming_soon_b2') },
+        { icon: '◇', text: t('shop_coming_soon_b3') },
+    ];
+
+    const scrollToNewsletter = () => {
+        document.getElementById('newsletter')?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    return (
+        <section className="py-20 md:py-28" style={{ backgroundColor: '#FAF8F4' }}>
+            <div className="max-w-2xl mx-auto px-4 text-center">
+                <p className="text-xs tracking-[0.45em] uppercase mb-5 font-semibold" style={{ color: '#B8955A' }}>
+                    {t('shop_coming_soon_tag')}
+                </p>
+                <h1 className="font-serif text-3xl md:text-4xl font-normal leading-tight mb-6" style={{ color: '#1A1A1A' }}>
+                    {t('shop_coming_soon_title')}
+                </h1>
+                <div className="h-0.5 w-14 mx-auto mb-8 rounded-full" style={{ background: 'linear-gradient(90deg, transparent, #C8A96E, transparent)' }} />
+                <p className="font-light leading-relaxed mb-12 max-w-lg mx-auto" style={{ color: '#6B6560', fontSize: '1.0625rem' }}>
+                    {t('shop_coming_soon_desc')}
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12 text-left">
+                    {benefits.map((b) => (
+                        <div
+                            key={b.text}
+                            className="rounded-2xl bg-white px-5 py-6 border border-[#EDE8DD] shadow-sm"
+                        >
+                            <span className="text-lg mb-3 block" style={{ color: '#C8A96E' }}>{b.icon}</span>
+                            <p className="text-xs sm:text-sm font-light leading-relaxed" style={{ color: '#5C574F' }}>{b.text}</p>
+                        </div>
+                    ))}
+                </div>
+                <p className="text-sm font-light mb-8 max-w-md mx-auto" style={{ color: '#9A9490' }}>
+                    {t('shop_coming_soon_newsletter')}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center items-stretch sm:items-center">
+                    <button
+                        type="button"
+                        onClick={scrollToNewsletter}
+                        className="btn-primary text-center justify-center"
+                        style={{ letterSpacing: '0.12em' }}
+                    >
+                        {t('newsletter_submit')}
+                    </button>
+                    <Link href="/blog" className="btn-secondary text-center justify-center" style={{ letterSpacing: '0.12em' }}>
+                        {t('shop_coming_soon_blog')}
+                    </Link>
+                    <Link href="/contact" className="btn-secondary text-center justify-center" style={{ letterSpacing: '0.12em' }}>
+                        {t('shop_coming_soon_contact')}
+                    </Link>
+                </div>
+            </div>
+        </section>
+    );
+}
+
 export default function ShopIndex({ products, categories = [], activeCategory = null, activeSort = 'pertinence', activeSearch = '', pagination = null }) {
     const { t } = useT();
+    const { catalogComingSoon } = usePage().props;
+    const showComingSoon = catalogComingSoon && !activeSearch;
 
     const buildQuery = (overrides = {}) => {
         const params = {};
@@ -205,13 +278,14 @@ export default function ShopIndex({ products, categories = [], activeCategory = 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    const metaBrand = withBrand(t);
     const metaDesc = activeCategory
-        ? `${activeCategory.name} — ${t('meta_shop_default')}`.slice(0, 170)
-        : t('meta_shop_default');
+        ? `${activeCategory.name} — ${t('meta_shop_default', metaBrand)}`.slice(0, 170)
+        : t('meta_shop_default', metaBrand);
 
     return (
         <PublicLayout>
-            <Head title={activeCategory ? `${activeCategory.name} — ${t('shop_title')}` : `${t('shop_title')} — SoukJannah`}>
+            <Head title={activeCategory ? docTitle(t, `${activeCategory.name} — ${t('shop_title')}`) : docTitle(t, t('shop_title'))}>
                 <meta head-key="description" name="description" content={metaDesc} />
             </Head>
             {/* Fil d'Ariane */}
@@ -239,29 +313,37 @@ export default function ShopIndex({ products, categories = [], activeCategory = 
                 </div>
             </div>
 
-            {/* Barre filtres */}
-            <div className="border-b sticky top-16 z-40 bg-white shadow-sm" style={{ borderColor: '#E8E2D9' }}>
+            {/* Barre filtres — masquée en mode ouverture prochaine */}
+            {!showComingSoon && (
+            <div className="border-b sticky top-16 z-50 bg-white shadow-sm" style={{ borderColor: '#E8E2D9' }}>
                 <div className="max-w-6xl mx-auto px-4">
-                    <div className="flex items-center gap-2 overflow-x-auto py-2.5">
+                    <div className="flex items-center gap-2 py-2.5 min-w-0">
                         <SortDropdown activeSort={activeSort} onChange={changeSort} />
-                        {categories.length > 0 && <div className="h-5 w-px flex-shrink-0 mx-1" style={{ backgroundColor: '#E8E2D9' }} />}
-                        {activeCategory && (
-                            <button onClick={() => filterByCategory(null)} className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border whitespace-nowrap transition-colors" style={{ borderColor: '#D4CFC8', color: '#9A9490', backgroundColor: 'white' }}>
-                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
-                                {t('shop_all')}
-                            </button>
+                        {categories.length > 0 && (
+                            <>
+                                <div className="h-5 w-px flex-shrink-0 mx-1" style={{ backgroundColor: '#E8E2D9' }} />
+                                <div className="flex items-center gap-2 overflow-x-auto min-w-0 flex-1 pb-0.5">
+                                    {activeCategory && (
+                                        <button onClick={() => filterByCategory(null)} className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border whitespace-nowrap transition-colors" style={{ borderColor: '#D4CFC8', color: '#9A9490', backgroundColor: 'white' }}>
+                                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
+                                            {t('shop_all')}
+                                        </button>
+                                    )}
+                                    {categories.map((cat) => (
+                                        <button key={cat.id} onClick={() => filterByCategory(cat.slug)} className="flex-shrink-0 px-4 py-1.5 text-xs font-medium transition-all whitespace-nowrap border" style={activeCategory?.slug === cat.slug ? { backgroundColor: '#1A1A1A', color: 'white', borderColor: '#1A1A1A' } : { backgroundColor: 'white', color: '#6B6560', borderColor: '#E8E2D9' }} onMouseEnter={(e) => { if (activeCategory?.slug !== cat.slug) { e.currentTarget.style.borderColor = '#C8A96E'; e.currentTarget.style.color = '#C8A96E'; }}} onMouseLeave={(e) => { if (activeCategory?.slug !== cat.slug) { e.currentTarget.style.borderColor = '#E8E2D9'; e.currentTarget.style.color = '#6B6560'; }}}>
+                                            {cat.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            </>
                         )}
-                        {categories.map((cat) => (
-                            <button key={cat.id} onClick={() => filterByCategory(cat.slug)} className="flex-shrink-0 px-4 py-1.5 text-xs font-medium transition-all whitespace-nowrap border" style={activeCategory?.slug === cat.slug ? { backgroundColor: '#1A1A1A', color: 'white', borderColor: '#1A1A1A' } : { backgroundColor: 'white', color: '#6B6560', borderColor: '#E8E2D9' }} onMouseEnter={(e) => { if (activeCategory?.slug !== cat.slug) { e.currentTarget.style.borderColor = '#C8A96E'; e.currentTarget.style.color = '#C8A96E'; }}} onMouseLeave={(e) => { if (activeCategory?.slug !== cat.slug) { e.currentTarget.style.borderColor = '#E8E2D9'; e.currentTarget.style.color = '#6B6560'; }}}>
-                                {cat.name}
-                            </button>
-                        ))}
                     </div>
                 </div>
             </div>
+            )}
 
             {/* Vue catégories */}
-            {!activeCategory && categories.length > 0 && (
+            {!showComingSoon && !activeCategory && categories.length > 0 && (
                 <section className="border-b py-12" style={{ backgroundColor: '#FAF8F4', borderColor: '#E8E2D9' }}>
                     <div className="max-w-6xl mx-auto px-4">
                         <p className="text-xs tracking-[0.4em] uppercase mb-6 font-light" style={{ color: '#C8A96E' }}>{t('shop_browse_tag')}</p>
@@ -277,7 +359,9 @@ export default function ShopIndex({ products, categories = [], activeCategory = 
                 </section>
             )}
 
-            {/* Grille produits */}
+            {showComingSoon ? (
+                <ShopComingSoon />
+            ) : (
             <div className="max-w-6xl mx-auto px-4 py-10">
                 <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
                     <p className="text-xs font-light" style={{ color: '#9A9490' }}>
@@ -316,6 +400,7 @@ export default function ShopIndex({ products, categories = [], activeCategory = 
 
                 <Pagination pagination={pagination} onPageChange={goToPage} />
             </div>
+            )}
         </PublicLayout>
     );
 }

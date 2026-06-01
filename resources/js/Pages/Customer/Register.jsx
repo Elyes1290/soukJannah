@@ -2,6 +2,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import PublicLayout from '../../Layouts/PublicLayout';
 import PasswordInput from '../../Components/PasswordInput';
 import { useT } from '../../contexts/LanguageContext';
+import { docTitle } from '../../i18n/docTitle';
 
 function GoogleIcon() {
     return (
@@ -34,7 +35,7 @@ export default function CustomerRegister() {
 
     return (
         <PublicLayout>
-            <Head title={`${t('account_register_title')} — SoukJannah`} />
+            <Head title={docTitle(t, t('account_register_title'))} />
 
             <section className="border-b py-12 text-center" style={{ backgroundColor: '#F0EBE1', borderColor: '#E8E2D9' }}>
                 <p className="text-xs tracking-[0.4em] uppercase mb-3 font-light" style={{ color: '#C8A96E' }}>{t('account_tag')}</p>
@@ -51,12 +52,12 @@ export default function CustomerRegister() {
                     style={{ borderColor: '#E8E2D9', backgroundColor: '#fff', color: '#1A1A1A' }}
                 >
                     <GoogleIcon />
-                    Continuer avec Google
+                    {t('account_google_continue')}
                 </a>
 
                 <div className="flex items-center gap-3 mb-6">
                     <div className="flex-1 h-px" style={{ backgroundColor: '#E8E2D9' }}></div>
-                    <span className="text-xs font-light uppercase tracking-widest" style={{ color: '#9A9490' }}>ou</span>
+                    <span className="text-xs font-light uppercase tracking-widest" style={{ color: '#9A9490' }}>{t('account_or')}</span>
                     <div className="flex-1 h-px" style={{ backgroundColor: '#E8E2D9' }}></div>
                 </div>
 
@@ -107,7 +108,7 @@ export default function CustomerRegister() {
                             onChange={e => setData('email', e.target.value)}
                             className="w-full border px-4 py-3 text-sm font-light outline-none focus:border-amber-600 transition-colors"
                             style={{ borderColor: errors.email ? '#dc2626' : '#E8E2D9', backgroundColor: '#FAF8F4' }}
-                            placeholder="votre@email.com"
+                            placeholder={t('account_email_placeholder')}
                             required
                         />
                         {errors.email && <p className="text-xs mt-1" style={{ color: '#dc2626' }}>{errors.email}</p>}
@@ -120,7 +121,7 @@ export default function CustomerRegister() {
                         <PasswordInput
                             value={data.password}
                             onChange={e => setData('password', e.target.value)}
-                            placeholder="Minimum 8 caractères"
+                            placeholder={t('account_password_placeholder_min')}
                             error={!!errors.password}
                             required
                         />

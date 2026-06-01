@@ -50,7 +50,10 @@ export default function PostsIndex({ posts }) {
                             {posts.map((post) => (
                                 <tr key={post.id} className="border-b" style={{ borderColor: '#F5F2EE' }}>
                                     <td className="px-6 py-4">
-                                        <p className="text-sm font-medium" style={{ color: '#1A1A1A' }}>{post.title}</p>
+                                        <p className="text-sm font-medium" style={{ color: '#1A1A1A' }}>{post.title_fr}</p>
+                                        {post.title_en && (
+                                            <p className="text-xs font-light mt-0.5" style={{ color: '#9A9490' }}>{post.title_en}</p>
+                                        )}
                                         <p className="text-xs font-light mt-0.5" style={{ color: '#9A9490' }}>/blog/{post.slug}</p>
                                     </td>
                                     <td className="px-6 py-4">

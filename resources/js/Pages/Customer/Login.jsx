@@ -2,6 +2,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import PublicLayout from '../../Layouts/PublicLayout';
 import PasswordInput from '../../Components/PasswordInput';
 import { useT } from '../../contexts/LanguageContext';
+import { docTitle } from '../../i18n/docTitle';
 
 function GoogleIcon() {
     return (
@@ -16,7 +17,7 @@ function GoogleIcon() {
 }
 
 export default function CustomerLogin({ redirectTo = '' }) {
-    const { t } = useT();
+    const { t, translateFlash } = useT();
     const { errors, flash } = usePage().props;
     const { data, setData, post, processing } = useForm({ email: '', password: '', redirect_to: redirectTo });
 
@@ -25,9 +26,14 @@ export default function CustomerLogin({ redirectTo = '' }) {
         post('/mon-compte/connexion');
     };
 
+    const flashErrorMessage =
+        translateFlash(flash?.error);
+
+    const showFlashError = flash?.error != null && flashErrorMessage !== null && flashErrorMessage !== '';
+
     return (
         <PublicLayout>
-            <Head title={`${t('account_login_title')} — SoukJannah`} />
+            <Head title={docTitle(t, t('account_login_title'))} />
 
             <section className="border-b py-12 text-center" style={{ backgroundColor: '#F0EBE1', borderColor: '#E8E2D9' }}>
                 <p className="text-xs tracking-[0.4em] uppercase mb-3 font-light" style={{ color: '#C8A96E' }}>{t('account_tag')}</p>
@@ -37,9 +43,9 @@ export default function CustomerLogin({ redirectTo = '' }) {
 
             <div className="max-w-md mx-auto px-4 py-16">
 
-                {flash?.error && (
+                {showFlashError && (
                     <div className="mb-6 p-4 border text-sm font-light" style={{ borderColor: '#dc2626', backgroundColor: '#fef2f2', color: '#dc2626' }}>
-                        {flash.error}
+                        {flashErrorMessage}
                     </div>
                 )}
 
@@ -50,12 +56,12 @@ export default function CustomerLogin({ redirectTo = '' }) {
                     style={{ borderColor: '#E8E2D9', backgroundColor: '#fff', color: '#1A1A1A' }}
                 >
                     <GoogleIcon />
-                    Continuer avec Google
+                    {t('account_google_continue')}
                 </a>
 
                 <div className="flex items-center gap-3 mb-6">
                     <div className="flex-1 h-px" style={{ backgroundColor: '#E8E2D9' }}></div>
-                    <span className="text-xs font-light uppercase tracking-widest" style={{ color: '#9A9490' }}>ou</span>
+                    <span className="text-xs font-light uppercase tracking-widest" style={{ color: '#9A9490' }}>{t('account_or')}</span>
                     <div className="flex-1 h-px" style={{ backgroundColor: '#E8E2D9' }}></div>
                 </div>
 
@@ -71,7 +77,7 @@ export default function CustomerLogin({ redirectTo = '' }) {
                             onChange={e => setData('email', e.target.value)}
                             className="w-full border px-4 py-3 text-sm font-light outline-none focus:border-amber-600 transition-colors"
                             style={{ borderColor: errors.email ? '#dc2626' : '#E8E2D9', backgroundColor: '#FAF8F4' }}
-                            placeholder="votre@email.com"
+                            placeholder={t('account_email_placeholder')}
                             required
                             autoComplete="email"
                         />

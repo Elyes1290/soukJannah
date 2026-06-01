@@ -2,13 +2,14 @@ import { Head } from '@inertiajs/react';
 import { useState } from 'react';
 import CustomerLayout from '../../Layouts/CustomerLayout';
 import { useT } from '../../contexts/LanguageContext';
+import { docTitle } from '../../i18n/docTitle';
 
 function copyToClipboard(text, onCopied) {
     navigator.clipboard?.writeText(text).then(() => onCopied(text));
 }
 
 export default function CustomerPromos({ promos }) {
-    const { t, lang } = useT();
+    const { t } = useT();
     const [copied, setCopied] = useState('');
 
     const handleCopy = (code) => {
@@ -25,7 +26,7 @@ export default function CustomerPromos({ promos }) {
 
     return (
         <CustomerLayout title={t('account_nav_promos')}>
-            <Head title={`${t('account_nav_promos')} — SoukJannah`} />
+            <Head title={docTitle(t, t('account_nav_promos'))} />
 
             {promos.length === 0 ? (
                 <div className="text-center py-12 border" style={{ borderColor: '#E8E2D9' }}>
@@ -39,7 +40,6 @@ export default function CustomerPromos({ promos }) {
                         {promos.map(promo => (
                             <div key={promo.code} className="border flex flex-wrap items-center justify-between gap-4 p-5" style={{ borderColor: '#E8E2D9', backgroundColor: '#FAF8F4' }}>
                                 <div className="flex items-start gap-4">
-                                    {/* Badge réduction */}
                                     <div className="flex-shrink-0 w-14 h-14 flex items-center justify-center" style={{ backgroundColor: '#C8A96E' }}>
                                         <span className="text-white font-bold text-lg leading-none">{formatValue(promo.type, promo.value)}</span>
                                     </div>
@@ -47,19 +47,19 @@ export default function CustomerPromos({ promos }) {
                                         <p className="font-mono text-base font-bold tracking-widest" style={{ color: '#1A1A1A' }}>{promo.code}</p>
                                         <p className="text-xs font-light mt-0.5" style={{ color: '#9A9490' }}>
                                             {promo.type === 'percent'
-                                                ? `${lang === 'fr' ? `${promo.value}% de réduction` : `${promo.value}% off`}`
-                                                : `${promo.value} CHF ${lang === 'fr' ? 'de réduction' : 'discount'}`
-                                            }
-                                            {promo.min_order_amount > 0 && ` · ${lang === 'fr' ? `Dès ${promo.min_order_amount} CHF` : `From ${promo.min_order_amount} CHF`}`}
+                                                ? t('promo_discount_percent', { value: promo.value })
+                                                : t('promo_discount_amount', { value: promo.value })}
+                                            {promo.min_order_amount > 0 && ` · ${t('promo_min_from', { amount: promo.min_order_amount })}`}
                                         </p>
                                         {promo.expires_at && (
                                             <p className="text-xs font-light mt-0.5" style={{ color: '#d97706' }}>
-                                                {lang === 'fr' ? `Expire le ${promo.expires_at}` : `Expires ${promo.expires_at}`}
+                                                {t('promo_expires_short', { date: promo.expires_at })}
                                             </p>
                                         )}
                                     </div>
                                 </div>
                                 <button
+                                    type="button"
                                     onClick={() => handleCopy(promo.code)}
                                     className="flex items-center gap-2 px-5 py-2.5 text-xs font-medium uppercase tracking-wider border transition-colors"
                                     style={{

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useT } from '../contexts/LanguageContext';
 
 function EyeIcon({ open }) {
     return open ? (
@@ -22,6 +23,7 @@ function EyeIcon({ open }) {
  */
 export default function PasswordInput({ dark = false, error = false, className = '', style = {}, ...props }) {
     const [visible, setVisible] = useState(false);
+    const { t } = useT();
 
     const borderColor = error
         ? '#dc2626'
@@ -48,7 +50,7 @@ export default function PasswordInput({ dark = false, error = false, className =
                 onClick={() => setVisible(v => !v)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 transition-opacity hover:opacity-60"
                 style={{ color: dark ? '#5A5550' : '#9A9490' }}
-                aria-label={visible ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                aria-label={visible ? t('a11y_password_hide') : t('a11y_password_show')}
             >
                 <EyeIcon open={visible} />
             </button>

@@ -2,22 +2,28 @@ import { Head, Link } from '@inertiajs/react';
 import CustomerLayout from '../../Layouts/CustomerLayout';
 import { useT } from '../../contexts/LanguageContext';
 import WishlistButton from '../../Components/WishlistButton';
+import { docTitle } from '../../i18n/docTitle';
 
 export default function Wishlist({ items }) {
-    const { t, lang } = useT();
+    const { t } = useT();
+
+    const subtitle =
+        items.length === 0
+            ? t('wishlist_sub_empty')
+            : items.length === 1
+                ? t('wishlist_saved_one')
+                : t('wishlist_saved_other', { count: items.length });
 
     return (
         <CustomerLayout>
-            <Head title={lang === 'fr' ? 'Mes favoris — SoukJannah' : 'My Wishlist — SoukJannah'} />
+            <Head title={docTitle(t, t('wishlist_heading'))} />
 
             <div className="mb-8">
                 <h1 className="font-serif text-2xl mb-1" style={{ color: '#1A1A1A' }}>
-                    {lang === 'fr' ? 'Mes favoris' : 'My Wishlist'}
+                    {t('wishlist_heading')}
                 </h1>
                 <p className="text-sm font-light" style={{ color: '#9A9490' }}>
-                    {items.length === 0
-                        ? (lang === 'fr' ? 'Aucun produit sauvegardé' : 'No saved products')
-                        : (lang === 'fr' ? `${items.length} produit${items.length > 1 ? 's' : ''} sauvegardé${items.length > 1 ? 's' : ''}` : `${items.length} saved product${items.length > 1 ? 's' : ''}`)}
+                    {subtitle}
                 </p>
             </div>
 
@@ -27,14 +33,14 @@ export default function Wishlist({ items }) {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
                     </svg>
                     <p className="text-sm font-light mb-6" style={{ color: '#9A9490' }}>
-                        {lang === 'fr' ? 'Vous n\'avez pas encore de favoris.' : 'You have no favorites yet.'}
+                        {t('wishlist_empty_hint')}
                     </p>
                     <Link
                         href="/boutique"
                         className="inline-block px-6 py-3 text-xs font-medium tracking-widest uppercase transition-colors"
                         style={{ backgroundColor: '#1A1A1A', color: '#FAF8F4' }}
                     >
-                        {lang === 'fr' ? 'Découvrir la boutique' : 'Explore the shop'}
+                        {t('account_shop_now')}
                     </Link>
                 </div>
             ) : (

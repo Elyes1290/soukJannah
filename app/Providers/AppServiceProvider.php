@@ -6,6 +6,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Pail\PailServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,7 +15,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // laravel/pail est en require-dev ; en prod (FTP + composer --no-dev) il n'est pas présent.
+        // On désactive son auto-discovery (composer.json dont-discover) et on l'enregistre seulement en local.
+        if ($this->app->environment('local') && class_exists(PailServiceProvider::class)) {
+            $this->app->register(PailServiceProvider::class);
+        }
     }
 
     /**

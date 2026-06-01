@@ -1,14 +1,18 @@
 import { Head, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { useT } from '../../contexts/LanguageContext';
+import { docTitle, withBrand } from '../../i18n/docTitle';
+import { localizePost, formatPostDate } from '../../utils/postLocale';
 
 function PostCard({ post }) {
-    const { t } = useT();
+    const { t, lang } = useT();
+    const localized = localizePost(post, lang);
+
     return (
         <Link href={`/blog/${post.slug}`} className="group block">
             <div className="aspect-video overflow-hidden mb-4" style={{ backgroundColor: '#F0EBE1' }}>
                 {post.cover_image_url ? (
-                    <img src={post.cover_image_url} alt={post.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                    <img src={post.cover_image_url} alt={localized.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center">
                         <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1} style={{ color: '#D4CFC8' }}>
@@ -18,12 +22,12 @@ function PostCard({ post }) {
                 )}
             </div>
             <div className="flex items-center gap-3 mb-2">
-                <span className="text-xs font-light" style={{ color: '#9A9490' }}>{post.published_at}</span>
+                <span className="text-xs font-light" style={{ color: '#9A9490' }}>{formatPostDate(post.published_at, lang)}</span>
                 <span style={{ color: '#D4CFC8' }}>·</span>
-                <span className="text-xs font-light" style={{ color: '#9A9490' }}>{post.reading_time} {t('common_min_read')}</span>
+                <span className="text-xs font-light" style={{ color: '#9A9490' }}>{localized.reading_time} {t('common_min_read')}</span>
             </div>
-            <h2 className="font-serif text-lg font-normal leading-snug mb-2 group-hover:opacity-70 transition-opacity" style={{ color: '#1A1A1A' }}>{post.title}</h2>
-            {post.excerpt && <p className="text-sm font-light leading-relaxed line-clamp-2" style={{ color: '#6B6560' }}>{post.excerpt}</p>}
+            <h2 className="font-serif text-lg font-normal leading-snug mb-2 group-hover:opacity-70 transition-opacity" style={{ color: '#1A1A1A' }}>{localized.title}</h2>
+            {localized.excerpt && <p className="text-sm font-light leading-relaxed line-clamp-2" style={{ color: '#6B6560' }}>{localized.excerpt}</p>}
             <div className="flex items-center gap-1.5 mt-3 text-xs font-medium tracking-wider" style={{ color: '#C8A96E' }}>
                 {t('blog_read_more')}
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -38,8 +42,8 @@ export default function BlogIndex({ posts }) {
     const { t } = useT();
     return (
         <PublicLayout>
-            <Head title={`${t('blog_title')} — SoukJannah`}>
-                <meta head-key="description" name="description" content={t('meta_blog_default')} />
+            <Head title={docTitle(t, t('blog_title'))}>
+                <meta head-key="description" name="description" content={t('meta_blog_default', withBrand(t))} />
             </Head>
             <section className="py-20 text-center border-b" style={{ backgroundColor: '#FAF8F4', borderColor: '#E8E2D9' }}>
                 <div className="max-w-2xl mx-auto px-4">

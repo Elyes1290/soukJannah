@@ -80,9 +80,14 @@ const NAV_ITEMS = (t) => [
 ];
 
 export default function CustomerLayout({ children, title }) {
-    const { t } = useT();
-    const { authCustomer } = usePage().props;
+    const { t, translateFlash } = useT();
+    const { authCustomer, flash } = usePage().props;
     const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+
+    const flashOk = translateFlash(flash?.success);
+    const flashErr = translateFlash(flash?.error);
+    const showFlashOk = flash?.success != null && flashOk !== null && flashOk !== '';
+    const showFlashErr = flash?.error != null && flashErr !== null && flashErr !== '';
 
     const isActive = (href, exact = false) => {
         if (exact) return currentPath === href;
@@ -160,6 +165,15 @@ export default function CustomerLayout({ children, title }) {
                         {title && (
                             <p className="text-xs tracking-widest uppercase font-medium mb-6" style={{ color: '#1A1A1A' }}>{title}</p>
                         )}
+                        {showFlashErr ? (
+                            <div className="mb-6 p-4 border text-sm font-light" style={{ borderColor: '#dc2626', backgroundColor: '#fef2f2', color: '#dc2626' }}>
+                                {flashErr}
+                            </div>
+                        ) : showFlashOk ? (
+                            <div className="mb-6 p-4 border text-sm font-light" style={{ borderColor: '#16a34a', backgroundColor: '#f0fdf4', color: '#16a34a' }}>
+                                ✓ {flashOk}
+                            </div>
+                        ) : null}
                         {children}
                     </main>
 

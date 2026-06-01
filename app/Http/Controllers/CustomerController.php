@@ -157,7 +157,9 @@ class CustomerController extends Controller
 
         if (! $customer) {
             return redirect()->route('customer.login')
-                ->with('error', 'Lien de vérification invalide ou expiré.');
+                ->with('error', [
+                    'key' => 'flash_verify_link_invalid',
+                ]);
         }
 
         $customer->update([
@@ -178,7 +180,9 @@ class CustomerController extends Controller
         $request->session()->regenerate();
 
         return redirect()->route('customer.dashboard')
-            ->with('success', 'Votre compte est activé. Bienvenue !');
+            ->with('success', [
+                'key' => 'flash_account_verified_welcome',
+            ]);
     }
 
     // ── Dashboard ─────────────────────────────────────────────────────────────
@@ -241,7 +245,9 @@ class CustomerController extends Controller
             'phone' => $request->phone ?? '',
         ]);
 
-        return back()->with('success', 'Profil mis à jour.');
+        return back()->with('success', [
+            'key' => 'flash_profile_updated',
+        ]);
     }
 
     // ── Sécurité / mot de passe ───────────────────────────────────────────────
@@ -267,7 +273,9 @@ class CustomerController extends Controller
             ]);
             $customer->update(['password' => Hash::make($request->password)]);
 
-            return back()->with('success', 'Mot de passe défini avec succès.');
+            return back()->with('success', [
+                'key' => 'flash_password_set_ok',
+            ]);
         }
 
         // Customer with existing password: require current password
@@ -277,12 +285,14 @@ class CustomerController extends Controller
         ]);
 
         if (! Hash::check($request->current_password, $customer->password)) {
-            return back()->withErrors(['current_password' => 'Mot de passe actuel incorrect.']);
+            return back()->withErrors(['current_password' => 'account_password_current_wrong']);
         }
 
         $customer->update(['password' => Hash::make($request->password)]);
 
-        return back()->with('success', 'Mot de passe modifié.');
+        return back()->with('success', [
+            'key' => 'flash_password_changed_ok',
+        ]);
     }
 
     // ── Adresses ──────────────────────────────────────────────────────────────
@@ -338,7 +348,9 @@ class CustomerController extends Controller
             'is_default' => $isFirst || $request->boolean('is_default'),
         ]);
 
-        return back()->with('success', 'Adresse ajoutée.');
+        return back()->with('success', [
+            'key' => 'flash_address_added',
+        ]);
     }
 
     public function updateAddress(Request $request, CustomerAddress $address)
@@ -376,7 +388,9 @@ class CustomerController extends Controller
             'is_default' => $request->boolean('is_default'),
         ]);
 
-        return back()->with('success', 'Adresse mise à jour.');
+        return back()->with('success', [
+            'key' => 'flash_address_updated',
+        ]);
     }
 
     public function destroyAddress(CustomerAddress $address)
@@ -385,7 +399,9 @@ class CustomerController extends Controller
         abort_if($address->customer_id !== $customer->id, 403);
         $address->delete();
 
-        return back()->with('success', 'Adresse supprimée.');
+        return back()->with('success', [
+            'key' => 'flash_address_deleted',
+        ]);
     }
 
     public function setDefaultAddress(CustomerAddress $address)
@@ -395,7 +411,9 @@ class CustomerController extends Controller
         CustomerAddress::where('customer_id', $customer->id)->update(['is_default' => false]);
         $address->update(['is_default' => true]);
 
-        return back()->with('success', 'Adresse par défaut mise à jour.');
+        return back()->with('success', [
+            'key' => 'flash_address_default_updated',
+        ]);
     }
 
     // ── Avis ──────────────────────────────────────────────────────────────────
@@ -486,7 +504,7 @@ class CustomerController extends Controller
             ->where('product_id', $request->product_id)
             ->exists();
         if ($alreadyReviewed) {
-            return back()->withErrors(['content' => 'Vous avez déjà laissé un avis pour ce produit.']);
+            return back()->withErrors(['duplicate_review' => 'flash_review_duplicate']);
         }
 
         Review::create([
@@ -500,7 +518,9 @@ class CustomerController extends Controller
             'verified_purchase' => true,
         ]);
 
-        return back()->with('success', 'Merci pour votre avis ! Il sera visible après validation.');
+        return back()->with('success', [
+            'key' => 'flash_review_thanks_pending',
+        ]);
     }
 
     // ── Codes promo ───────────────────────────────────────────────────────────
@@ -544,23 +564,23 @@ class CustomerController extends Controller
             ->latest()
             ->get()
             ->map(fn ($o) => [
-            'id' => $o->id,
-            'number' => $o->number,
-            'status' => $o->status,
-            'total' => $o->total,
-            'shipping' => $o->shipping,
-            'tracking_number' => $o->tracking_number,
-            'created_at' => $o->created_at->format('d/m/Y'),
-            'return_request' => $o->returnRequest ? [
-                'status' => $o->returnRequest->status,
-                'admin_notes' => $o->returnRequest->admin_notes,
-            ] : null,
-            'items' => $o->items->map(fn ($i) => [
-                'product_name' => $i->product_name,
-                'quantity' => $i->quantity,
-                'total' => $i->total,
-            ]),
-        ]);
+                'id' => $o->id,
+                'number' => $o->number,
+                'status' => $o->status,
+                'total' => $o->total,
+                'shipping' => $o->shipping,
+                'tracking_number' => $o->tracking_number,
+                'created_at' => $o->created_at->format('d/m/Y'),
+                'return_request' => $o->returnRequest ? [
+                    'status' => $o->returnRequest->status,
+                    'admin_notes' => $o->returnRequest->admin_notes,
+                ] : null,
+                'items' => $o->items->map(fn ($i) => [
+                    'product_name' => $i->product_name,
+                    'quantity' => $i->quantity,
+                    'total' => $i->total,
+                ]),
+            ]);
     }
 
     // ── Retours ───────────────────────────────────────────────────────────────
@@ -581,7 +601,9 @@ class CustomerController extends Controller
 
         // Un seul retour par commande
         if ($order->returnRequest()->exists()) {
-            return back()->with('error', 'Une demande de retour existe déjà pour cette commande.');
+            return back()->with('error', [
+                'key' => 'flash_return_already_exists',
+            ]);
         }
 
         $data = $request->validate([
@@ -603,7 +625,9 @@ class CustomerController extends Controller
             Mail::to($adminEmail)->send(new ReturnRequestMail($returnRequest));
         }
 
-        return back()->with('success', 'Votre demande de retour a bien été envoyée. Nous vous répondrons sous 48h.');
+        return back()->with('success', [
+            'key' => 'flash_return_request_sent',
+        ]);
     }
 
     private function customerData(Customer $customer): array

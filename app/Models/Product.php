@@ -45,4 +45,14 @@ class Product extends Model
     {
         return $this->main_image ? asset('storage/' . $this->main_image) : null;
     }
+
+    /** Boutique en mode « ouverture prochaine » (config forcée ou aucun produit actif). */
+    public static function catalogIsComingSoon(): bool
+    {
+        if (config('shop.catalog_coming_soon')) {
+            return true;
+        }
+
+        return ! static::where('is_active', true)->exists();
+    }
 }

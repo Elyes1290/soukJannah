@@ -1,6 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import PublicLayout from '../Layouts/PublicLayout';
 import { useT } from '../contexts/LanguageContext';
+import { docTitle, withBrand } from '../i18n/docTitle';
 
 function Section({ title, children }) {
     return (
@@ -21,8 +22,8 @@ export default function MentionsLegales() {
 
     return (
         <PublicLayout>
-            <Head title={`${t('legal_title')} — SoukJannah`}>
-                <meta head-key="description" name="description" content={t('meta_legal')} />
+            <Head title={docTitle(t, t('legal_title'))}>
+                <meta head-key="description" name="description" content={t('meta_legal', withBrand(t))} />
             </Head>
             {/* Fil d'ariane */}
             <div className="border-b" style={{ borderColor: '#E8E2D9', backgroundColor: '#FAF8F4' }}>
@@ -48,9 +49,11 @@ export default function MentionsLegales() {
                 <Section title={t('legal_publisher_title')}>
                     <p>{t('legal_publisher_p1')}</p>
                     <div className="mt-3 p-4 border" style={{ borderColor: '#E8E2D9', backgroundColor: '#F0EBE1' }}>
-                        <p><strong style={{ color: '#1A1A1A' }}>SoukJannah</strong></p>
-                        <p>Suisse</p>
-                        <p>Email : <a href={`mailto:${mail}`} className="underline hover:opacity-70" style={{ color: '#C8A96E' }}>{mail}</a></p>
+                        <p><strong style={{ color: '#1A1A1A' }}>{t('brand_name')}</strong></p>
+                        <p>{t('legal_publisher_country')}</p>
+                        <p>{t('legal_publisher_email_label')} :{' '}
+                            <a href={`mailto:${mail}`} className="underline hover:opacity-70" style={{ color: '#C8A96E' }}>{mail}</a>
+                        </p>
                     </div>
                     <p className="mt-3 text-xs italic" style={{ color: '#9A9490' }}>{t('legal_publisher_note')}</p>
                 </Section>
@@ -58,14 +61,14 @@ export default function MentionsLegales() {
                 <Section title={t('legal_hosting_title')}>
                     <p>{t('legal_hosting_p1')}</p>
                     <p className="mt-2">
-                        <strong style={{ color: '#1A1A1A' }}>Infomaniak Network SA</strong><br />
-                        Rue Eugène-Marziano 25, 1227 Les Acacias, Genève, Suisse<br />
-                        <a href="https://www.infomaniak.com" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-70" style={{ color: '#C8A96E' }}>www.infomaniak.com</a>
+                        <strong style={{ color: '#1A1A1A' }}>{t('legal_hosting_provider')}</strong><br />
+                        {t('legal_hosting_address')}<br />
+                        <a href="https://www.infomaniak.com" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-70" style={{ color: '#C8A96E' }}>{t('legal_hosting_site')}</a>
                     </p>
                 </Section>
 
                 <Section title={t('legal_ip_title')}>
-                    <p>{t('legal_ip_p1')}</p>
+                    <p>{t('legal_ip_p1', withBrand(t))}</p>
                     <p>{t('legal_ip_p2')}</p>
                 </Section>
 

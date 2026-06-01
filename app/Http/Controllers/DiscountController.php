@@ -14,26 +14,40 @@ class DiscountController extends Controller
 
         $code = DiscountCode::where('code', strtoupper(trim($request->code)))->first();
 
-        if (!$code) {
-            return back()->with('discount_error', 'Code promo invalide.');
+        if (! $code) {
+            return back()->with('discount_error', [
+                'key' => 'discount_err_invalid',
+            ]);
         }
 
-        if (!$code->isValid($cart->subtotal())) {
+        if (! $code->isValid($cart->subtotal())) {
             if ($code->min_amount > 0 && $cart->subtotal() < $code->min_amount) {
-                return back()->with('discount_error', "Ce code est valable dès {$code->min_amount} CHF d'achat.");
+                return back()->with('discount_error', [
+                    'key' => 'discount_err_min_amount',
+                    'vars' => ['amount' => number_format((float) $code->min_amount, 2, '.', '\'')],
+                ]);
             }
-            return back()->with('discount_error', 'Ce code promo n\'est plus valide.');
+
+            return back()->with('discount_error', [
+                'key' => 'discount_err_not_valid',
+            ]);
         }
 
         // Stocker le code en session
         session(['discount_code' => $code->code]);
 
-        return back()->with('discount_success', "Code « {$code->code} » appliqué avec succès !");
+        return back()->with('discount_success', [
+            'key' => 'discount_success_applied',
+            'vars' => ['code' => $code->code],
+        ]);
     }
 
     public function remove()
     {
         session()->forget('discount_code');
-        return back()->with('discount_success', 'Code promo retiré.');
+
+        return back()->with('discount_success', [
+            'key' => 'discount_success_removed',
+        ]);
     }
 }
